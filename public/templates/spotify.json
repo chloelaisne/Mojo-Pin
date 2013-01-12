@@ -1,0 +1,29 @@
+// Example JSON Spotify Object
+// URL: http://ws.spotify.com/search/1/track.json?q=Shiny
+{
+	"album":
+	{
+		"released": "1991",
+		"href": "spotify:album:4v5hSLj6ClyLqj2nnaPbfD",
+		"name": "Out Of Time",
+		"availability":
+		{
+			"territories": "AD AI AL AM AT AW AX AZ BA BE BG BM BV BY CA CH CY CZ DE DK EE ES FI FK FO FR GB GE GF GG GI GL GP GR GS HR HU IE IM IO IS IT JE KY LI LT LU LV MC MD ME MK MQ MS MT NC NL NO NZ PF PL PM PN PT RE RO RS RU SE SH SI SJ SK SM TC TF TR UA US VA VG WF YT"
+		}
+	},
+	"name": "Shiny Happy People",
+	"popularity": "0.64702",
+	"external-ids":
+	[{
+		"type": "isrc",
+		"id": "USWB19901525"
+	}],
+	"length": 223.133,
+	"href": "spotify:track:4er8NyQ8cFnZ2b643Tjc44",
+	"artists":
+	[{
+		"href": "spotify:artist:4KWTAlx2RvbpseOGMEmROg",
+		"name": "R.E.M."
+	}],
+	"track-number": "6"
+}
