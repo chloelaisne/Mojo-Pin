@@ -61,7 +61,6 @@ app.get('*', function (request, response, next){
 
 // Retrieve all users
 app.get('/json/users', function (request, response){
-  console.log('json users');
   var query = "SELECT * FROM `mp_users`";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
@@ -82,36 +81,59 @@ app.get('/json/user/:user_id', function (request, response){
   });
 });
 
-// Register user account
-app.post('/json/signup', function (request, response){
-  var query = "INSERT INTO `" + database + "`.`mp_users`(`id`, `facebook_id`, `active`) VALUES(NULL, 807794419, 0)";
-  connection.query(query, function (error, results, fields){
+// Facebook Authentification
+app.post('/json/facebookauth', function (request, response){
+  var query = "SELECT * FROM `" + database + "`.`mp_users` WHERE `mp_users`.`user` = ?";
+  connection.query(query, [request.body.user], function (error, results, fields){
+    if(error) throw error;
+    if(results && results.length == 1){
+      if(results[0].token == request.body.token){
+        var query = "UPDATE `" + database + "`.`mp_users` SET `token` = ? WHERE `mp_users`.`user` = ?";
+        connection.query(query, [request.body.token, request.body.user], function (error, results, fields){
+          if(error) throw error;
+          response.writeHead(200, {'Content-Type': 'application/json'});
+          response.write(JSON.stringify(results), 'utf-8');
+          response.end('\n');
+        });
+      }
+      else{
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.write(JSON.stringify(results), 'utf-8');
+        response.end('\n');
+      }
+    }
+    else{
+      var query = "INSERT INTO `" + database + "`.`mp_users`(`id`, `user`, `token`) VALUES(NULL, ?, ?)";
+      connection.query(query, [request.body.user, request.body.token], function (error, results, fields){
+        if(error) throw error;
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.write(JSON.stringify(results), 'utf-8');
+        response.end('\n');
+      });
+    }
+  }); 
+});
+
+// Update token
+app.put('/json/facebookauth', function (request, response){
+  var params = [request.body.token, request.body.id];
+  var query = "UPDATE `" + database + "`.`mp_users` SET `token` = '?' WHERE `mp_users`.`id` = ?";
+  connection.query(query, params, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');
   });
 });
-
-// Activate user account
-app.get('/json/user/activate/:user_id', function (request, response){ // Modify app.get to app.put
-  var query = "UPDATE `" + database + "`.`mp_users` SET `active` = '1' WHERE `mp_users`.`id` = '" + connection.escape(request.params.user_id) + "'"; // Modify request.params.user_id to request.body.user_id
-  connection.query(query, function (error, results, fields){
-    if(error) throw error;
-    response.writeHead(200, {'Content-Type': 'application/json'});
-    response.write(JSON.stringify(results), 'utf-8');
-    response.end('\n');
-  });
-});
-
 
 // ===== PINS ===== //
 
 // Retrieve all pins
 app.get('/json/pins', function (request, response){
-  var query = "SELECT * FROM `mp_pins`";
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_tracks`) ON (`mp_users`.id = `mp_pins`.user_id AND `mp_locations`.id = `mp_pins`.location_id AND `mp_tracks`.id = `mp_pins`.uri_id)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
+    console.log(JSON.stringify(results));
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');

@@ -1,29 +1,26 @@
 App.ActivityView = Backbone.View.extend({
 
-	tagName: 'ul',
+	tagName: 'li',
+
+	model: App.Activity,
+
+	template: _.template(Templates.Activity),
 
 	initialize: function(){
-		console.log('initialize ActivityView');
-		console.log('1');
-		//_.bindAll(this, 'render');
-		console.log('2');
-		this.collection = new App.ActivityCollection();
-		console.log('3');
-		//this.collection.bind('reset', this.render, this);
-        //this.collection.bind('add', this.render, this);
-        console.log('4');
-        this.collection.fetch({
-        	success: function(response){
-        		console.log('success', response);
-        	},
-        	error: function(response){
-        		console.log('error', response);
-        	}
-        });
+//		console.log('initialize ActivityView');
 	},
 
 	render: function(){
-		console.log('initialize ActivityView');
+//		console.log('render ActivityView');
+		
+		this.templateSettings = {
+			type		: this.model.get("type"),
+			title		: this.model.get("title"),
+			artists		: this.model.get("artists"),
+			location	: this.model.get("location")
+		};
+
+		$(this.el).html(this.template(this.templateSettings));
 	}
 	
 });

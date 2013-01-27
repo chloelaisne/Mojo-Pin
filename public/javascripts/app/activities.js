@@ -1,0 +1,1 @@
+App.Activities = Backbone.Model.extend();

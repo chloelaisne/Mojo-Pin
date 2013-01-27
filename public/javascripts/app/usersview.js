@@ -1,11 +1,11 @@
 App.UsersView = Backbone.View.extend({
 
 	initialize: function(){
-		console.log('initialize UsersView');
+//		console.log('initialize UsersView');
 	},
 
 	render: function(){
-		console.log('render UserView');
+//		console.log('render UserView');
 	}
 
 });

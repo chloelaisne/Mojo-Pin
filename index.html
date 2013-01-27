@@ -4,68 +4,62 @@
 
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <!-- Javascript Files -->
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCy57ndHPnW1X3zYFFnBkdvJoJ-OW8Krsc&sensor=true"></script>
     <script type="text/javascript" src="public/javascripts/jquery-1.7.2.js"></script>
     <script type="text/javascript" src="public/javascripts/underscore-1.3.3.js"></script>
     <script type="text/javascript" src="public/javascripts/backbone-0.9.2.js"></script>
     <!-- HTML Templates -->
-    <script type="text/template" class="template-header">
-      <h1>Mojo Pin</h1>
-      <nav>
-        <ul class="left">
-           <li id="goto-news">News</li>
-           <li id="goto-profile">Profile</li>
-        </ul>
-        <ul class="right">
-          <li id="goto-friends">Friends</li>
-          <li id="goto-pin" class="mp-icon"><span class="mp-plus"></span>Pin</li>
-        </ul>
-      </nav>
-    </script>
     <script type="text/template" class="template-user">
-      <div id="top">
-        <div class="picture">
-        </div>
-        <div class="information">
-          <div class="name">Chloé Laisné</div>
-          <div class="statistics"><span class="mp-disc"></span>9 memories</div>
-        </div>
-      </div>
-      <div id="sidebar">
-        <%= activity %>
-      </div>
-      <div id="map"></div>
+      
     </script>
     <script type="text/template" class="template-activity">
-      <ul>
-        <li>
-          <div class="music"><span class="track"></span><b>After The Rain</b> by Little Dragon</div>
-          <div class="location">Amsterdam</div>
-        </li>
-        <li>
-          <div class="music"><span class="playlist"></span><b>Little Dragon Mixtape</b> by chloe.laisne</div>
-          <div class="location">Hyper Island, Stockholm</div>
-        </li>
-      </ul>
+      <div class="music"><span class="track"></span><b>After The Rain</b> by Little Dragon</div>
+      <div class="location">Amsterdam</div>
+      <div class="music"><span class="playlist"></span><b>Little Dragon Mixtape</b> by chloe.laisne</div>
+      <div class="location">Hyper Island, Stockholm</div>
     </script>
     <script type="text/template" class="template-users">
       <div>
         Hello Facebook friends!
       </div>
     </script>
-    <!-- Backbone Files -->
+    <!-- Javascript Files -->
+    <script type="text/javascript" src="public/javascripts/apis/spotify.js"></script>
+    <script type="text/javascript" src="public/javascripts/templates.js"></script>
     <script type="text/javascript" src="public/javascripts/app.js"></script>
-    <script type="text/javascript" src="public/javascripts/app/activitycollection.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/resultsview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/edittrack.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/editlocation.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/editdescription.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/facebookauth.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/noticewindow.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/noticewindowview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/confirmationwindow.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/confirmationwindowview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/mapview.js"></script>
     <script type="text/javascript" src="public/javascripts/app/activity.js"></script>
     <script type="text/javascript" src="public/javascripts/app/activityview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/activitiescollection.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/activities.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/activitiesview.js"></script>
     <script type="text/javascript" src="public/javascripts/app/userview.js"></script>
-    <script type="text/javascript" src="public/javascripts/app/usersview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/friend.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/friendview.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/friendscollection.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/friends.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/friendsview.js"></script>
     <script type="text/javascript" src="public/javascripts/app/newsview.js"></script>
-    <script type="text/javascript" src="public/javascripts/app/navigationview.js"></script>
     <script type="text/javascript" src="public/javascripts/app/appview.js"></script>
     <script type="text/javascript" src="public/javascripts/app/router.js"></script>
     <script type="text/javascript" src="public/javascripts/setup.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        App.initialize();
+      });
+    </script>
+
     <!-- CSS Files -->
-    <link rel="stylesheet" type="text/css" charset="utf-8" href="sp://resources/css/eve.css">
+    <link rel="stylesheet" type="text/css" charset="utf-8" href="sp://resources/css/adam.css">
     <link rel="stylesheet" type="text/css" charset="utf-8" href="sp://resources/css/api.css">
     <link rel="stylesheet" type="text/css" charset="utf-8" href="sp://resources/css/player.css">
     <link rel="stylesheet" type="text/css" charset="utf-8" href="public/stylesheets/styles.css">

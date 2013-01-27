@@ -1,49 +1,53 @@
 App.Router = Backbone.Router.extend({
 
 	routes: {
-		''				: 'news',
+		''				: 'user',
 		'news'			: 'news',
 		'users'			: 'users',
-		'user/*user'	: 'user'
+		'user/*user'	: 'user',
+		'addPin'		: 'addPin'
 	},
 
-	views:{
-
-	},
+	views:{},
 
 	initialize: function(){
-		console.log('initialize Router 1');
+//		console.log('initialize Router');
 
 		_.bindAll(this, 'news', 'users', 'user');
 
 		this.views.app = new App.AppView({ el: $("body") });
-		this.views.news = new App.NewsView({ el: $('#global') });
-		this.views.user = new App.UserView({ el: $('#global') });
-		this.views.users = new App.UsersView({ el: $('#global') });
+		this.views.news = new App.NewsView();
+		this.views.user = new App.UserView();
+		this.views.friends = new App.FriendsView();
+		this.views.friends = new App.FriendsView();
+		this.views.editTrack = new App.EditTrackView();
+		this.views.editLocation = new App.EditLocationView();
+		this.views.editDescription = new App.EditDescriptionView();
 
 		this.view = this.views.app;        
         this.view.render();
-
-        console.log('initialize Router 2');
 	},
 
 	news: function(){
-		console.log('news Router 1');
-		this.view.body = this.views.news;
-		this.view.body.render();
-		console.log('news Router 2');
+//		console.log('news Router');
+		this.views.news.render();
+		$('#global').html(this.views.news.el);
 	},
 
 	users: function(){
-		console.log('users Router');
-		this.view.body = this.views.users;
-		this.view.body.render();
+//		console.log('users Router');
+		$('#global').html((this.views.friends.render()).el);
 	},
 
-	user: function(user){
-		console.log('user Router');
-		this.view.body = this.views.user;
-		this.view.body.render();
+	user: function(){
+//		console.log('user Router');
+		this.views.user.render();
+		$('#global').html(this.views.user.el);
+	},
+
+	addPin: function(){
+		this.views.editTrack.render();
+		$('#global').html(this.views.editTrack.el);
 	}
 
 });
