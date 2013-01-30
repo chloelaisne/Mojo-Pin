@@ -3,14 +3,8 @@ App.NoticeWindowView = Backbone.View.extend({
 	model: App.NoticeWindow,
 
 	initialize: function(){
-//		console.log('initialize NoticeWindowView');
-
 		Backbone.View.apply(this, arguments);
         google.maps.OverlayView.apply(this, arguments);
-	},
-
-	render: function(){
-//		console.log('render NoticeWindowView');
 	}
 	
 });
@@ -18,14 +12,10 @@ App.NoticeWindowView = Backbone.View.extend({
 _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.OverlayView.prototype,{
 
 	initialize: function(options){
-//		console.log('initialize NoticeWindowView.prototype');
-
 		this.setMap(this.options.map);
 	},
 
 	onAdd: function(){
-//		console.log('onAdd App.NoticeWindowView.prototype');
-
 		var div = document.createElement('div');
 		div.className = "window notice";
 

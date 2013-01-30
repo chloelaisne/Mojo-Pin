@@ -18,6 +18,7 @@ body {
 	padding: 0;
 	background-color: #373737;
 	font-family: "Lucida Grande", "Tahoma", "Arial", sans-serif;
+	font-weight: 300;
 	font-size: 12px;
 	text-shadow: none;
 }
@@ -372,21 +373,37 @@ nav ul li.active {
 	position: relative!important;
 }
 
-.window.notice {
+.window {
 	position: relative;
-	padding: 16.5px 20.5px;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
 }
 
-.window.notice canvas {
+.window.notice {
+	padding: 16.5px 20.5px;
+}
+
+.window.confirmation {
+	padding: 10px 10px 10px 17px;
+}
+
+.window canvas {
 	position: absolute;
 	left: 0;
 	top: 0;
 }
 
-.window.notice .music {
+.window .music,
+.window .location{
 	position: relative;
 	display: block;
+}
+
+.window .sp-button {
+	position: relative;
+	display: inline-block;
+}
+
+.window.notice .music {
 	color: #999997;
 	font-size: 15px;
 	margin-bottom: 10px;
@@ -397,8 +414,6 @@ nav ul li.active {
 }
 
 .window.notice .location {
-	position: relative;
-	display: block;
 	color: #999997;
 	font-size: 11px;
 }
@@ -877,6 +892,8 @@ nav ul li.mp-icon {
 	position: absolute;
 	right: 20px;
 	bottom: 24px;
+	color: #636363;
+	text-shadow: 0 1px 0 rgba(255,255,255,1);
 }
 
 .location .pagination .right {

@@ -8,20 +8,22 @@ App.ResultLocationView = Backbone.View.extend({
 			description	: this.model.get('description'),
 			reference	: this.model.get('reference')
 		});
-		var self = this;
-		App.Events.on("hasDetails", function(){
-			console.log('hasDetails');
-			var myLatlng = new google.maps.LatLng(self.resultLocation.get("latitude"),self.resultLocation.get("longitude"));
-			self.markerOptions = {
-				position: myLatlng,
-				map: App.mapView.map
-			};
-			self.marker = new google.maps.Marker(self.markerOptions);
-			App.mapView.map.setCenter(myLatlng);
-		});
+		App.Events.on("hasDetails", this.createMarker);
 	},
+
+	createMarker: function(){
+		this.position = new google.maps.LatLng(this.resultLocation.get("latitude"),this.resultLocation.get("longitude"));
+		this.markerOptions = {
+			position: this.position,
+			map: App.mapView.map
+		};
+		this.marker = new google.maps.Marker(this.markerOptions);
+		App.mapView.map.setCenter(this.position);
+		this.confirmationWindowView = new App.ConfirmationWindowView({ latlng: this.position });
+	},
+
 	initialize: function(){
-		_.bindAll(this, 'render', 'onClick');
+		_.bindAll(this, 'render', 'onClick', 'createMarker');
 	},
 	render: function(){
 		$(this.el).html(this.model.get('description'));

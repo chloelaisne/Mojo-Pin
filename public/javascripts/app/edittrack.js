@@ -104,34 +104,29 @@ App.EditTrackView = Backbone.View.extend({
 		return this;
 	},
 
-	renderPagination: function(){
-
+	renderPagination: function()
+	{
 		var self = this;
 
-		if(this.paginationView === undefined){
-
-			console.log('inside');
-
+		if(this.paginationView === undefined)
+		{
 			self.paginationView = new App.PaginationView().render();
-
 			$(self.el).append(self.paginationView.el);
-
 		}
-		else {
-
-			if(self.trackURI != null){
+		else
+		{
+			if(self.trackURI != null)
+			{
 				if($(".right button").hasClass("mp-flat"))
 					$(".right button").removeClass("mp-flat");
 			}
-			else {
+			else
+			{
 				if(!$(".right button").hasClass("mp-flat"))
 					$(".right button").addClass("mp-flat");
 			}
-
 		}
-
 		return this;
-
 	},
 
 
