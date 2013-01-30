@@ -4,15 +4,30 @@ App.EditTrackView = Backbone.View.extend({
 	
 	initialize: function(){
 
-		_.bindAll(this, 'render', 'renderResults', 'renderPlaying', 'renderDropzone');
+		_.bindAll(this, 'render', 'renderSearch', 'renderPlaying', 'renderDropzone', 'updateTrackURI', 'renderPagination');
+
+		App.Events.on("onSearchChanged", this.updateTrackURI);
 
 		var self = this;
 
 		$(function(){
 			Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, self.renderPlaying);
-			Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, self.renderDropzone);
+			Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, self.updateTrackURI);
 		});
 
+	},
+
+	updateTrackURI: function(uri){
+		if(typeof uri === 'object')
+			this.trackURI = Spotify.Application.links[0];
+		else 
+			this.trackURI = uri;
+
+		console.log(this.trackURI);
+
+		this.renderDropzone();
+
+		this.renderPagination();
 	},
 
 	renderDropzone: function(){
@@ -22,18 +37,18 @@ App.EditTrackView = Backbone.View.extend({
 
 		var self = this;
 
-		if(Spotify.Application.links.length != 0){
+		if(this.trackURI != null){
 
-			self.linkTrack = Spotify.Models.Track.fromURI(Spotify.Application.links[0], function(track){
+			self.trackModel = Spotify.Models.Track.fromURI(self.trackURI, function(track){
 
-				self.linkTrackname = track.name;
-				self.linkTrackartists = track.artists.join(", ");
-				self.linkTrackimage = track.image;
+				self.trackName = track.name;
+				self.trackArtists = track.artists.join(", ");
+				self.trackImage = track.image;
 
 				self.dropzoneSettings = {
-					trackname 		: self.linkTrackname,
-					trackartists 	: self.linkTrackartists,
-					trackimage 		: self.linkTrackimage
+					trackname 		: self.trackName,
+					trackartists 	: self.trackArtists,
+					trackimage 		: self.trackImage
 				};
 
 				self.dropzoneTemplate = _.template(Templates.DropzoneActive)(self.dropzoneSettings);
@@ -77,10 +92,48 @@ App.EditTrackView = Backbone.View.extend({
 		return this;
 	},
 
-	renderResults: function(){
-		$(this.el).append((new App.ResultsView().render()).el);
+	renderSearch: function(){
+		this.searchView = new App.SearchView().render();
+
+		var self = this;
+
+		$(function(){
+			$(self.searchView.el).insertAfter("h2");
+		});
+
 		return this;
 	},
+
+	renderPagination: function(){
+
+		var self = this;
+
+		if(this.paginationView === undefined){
+
+			console.log('inside');
+
+			self.paginationView = new App.PaginationView().render();
+
+			$(self.el).append(self.paginationView.el);
+
+		}
+		else {
+
+			if(self.trackURI != null){
+				if($(".right button").hasClass("mp-flat"))
+					$(".right button").removeClass("mp-flat");
+			}
+			else {
+				if(!$(".right button").hasClass("mp-flat"))
+					$(".right button").addClass("mp-flat");
+			}
+
+		}
+
+		return this;
+
+	},
+
 
 	render: function(){
 
@@ -90,7 +143,9 @@ App.EditTrackView = Backbone.View.extend({
 
 		this.renderDropzone();
 
-		this.renderResults();
+		this.renderSearch();
+
+		this.renderPagination()
 
 		return this;
 

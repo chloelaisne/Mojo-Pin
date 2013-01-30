@@ -11,28 +11,20 @@ App.AppView = Backbone.View.extend({
 	},
 
 	initialize: function(){
-//		console.log('initialize AppView');
-
 		_.bindAll(this, 'gotoNews', 'gotoProfile', 'gotoFriends', 'gotoPin', 'onClick', 'render');
 	},
 
 	gotoNews: function(e){
-//		console.log('gotoNews AppView');
-
 		e.preventDefault();
 		App.router.navigate('/news', true);
 	},
 
 	gotoProfile: function(e){
-//		console.log('gotoProfile AppView');
-
 		e.preventDefault();
 		App.router.navigate('/user/chloelaisne', true);
 	},
 
 	gotoFriends: function(e){
-//		console.log('gotoFriends AppView');
-
 		e.preventDefault();
 		App.router.navigate('/users', true);
 	},
@@ -43,8 +35,6 @@ App.AppView = Backbone.View.extend({
 	},
 
 	onClick: function(){
-		console.log('onClick AppView');
-
 		_.each(this.$('li'), function(element, index, list){
 			$(element + '.mp-icon>span').removeClass('active');
 			$(element).removeClass('active');

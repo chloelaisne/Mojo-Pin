@@ -5,7 +5,8 @@ App.Router = Backbone.Router.extend({
 		'news'			: 'news',
 		'users'			: 'users',
 		'user/*user'	: 'user',
-		'addPin'		: 'addPin'
+		'addPin'		: 'addPin',
+		'editLocation'	: 'routeToEditLocation'
 	},
 
 	views:{},
@@ -48,6 +49,11 @@ App.Router = Backbone.Router.extend({
 	addPin: function(){
 		this.views.editTrack.render();
 		$('#global').html(this.views.editTrack.el);
+	},
+
+	routeToEditLocation: function(){
+		this.views.editLocation.render();
+		$('#global').html(this.views.editLocation.el);
 	}
 
 });
