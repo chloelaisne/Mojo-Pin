@@ -11,7 +11,27 @@ Templates.DropzoneInactive = '<div id="dropzone" class="blank"><p><span class="m
 Templates.DropzoneActive = '<div id="dropzone"><div class="cover" style="background-size: 100% 100%; background-image: url(<%= trackimage %>);"></div><div class="meta"><div class="track-name"><%= trackname %></div><div class="artist-name"><%= trackartists %></div></div></div>';
 Templates.SearchLocation = '<div id="page-bottom"><div class="search" id="location"><form><input type="text" /></form><div id="results"></div></div></div>';
 Templates.EditDescription = '';
-Templates.Pagination = '<div class="pagination"><div class="left"><button class="sp-button mp-dark">Cancel</button></div><div class="right"><button class="sp-button mp-flat mp-icon"><span class="mp-arrow mp-arrow-right"></span>Next</button> or Cancel</div></div>';
+Templates.Pagination = '<div class="pagination"><div class="left"><button class="sp-button mp-dark">Cancel</button></div><div class="right"><button class="sp-button mp-flat mp-icon"><span class="mp-arrow mp-arrow-right"></span>Next</button></div></div>';
+
+// EDIT SECTION
+
+Templates.EditNavigation =
+'<div class="pagination">' +
+	'<div class="left">' +
+		'<button id="previous" class="sp-button <% if(previous.theme == "dark"){ %>mp-dark<% } %> <% if(previous.icon){ %>mp-icon<% } %>">' +
+			'<% if(previous.icon){ %><span class="mp-arrow mp-arrow-left"></span><% } %>' +
+			'<%= previous.label %>' +
+		'</button>' +
+	'</div>' +
+	'<div class="right">' +
+		'<button id="next" class="sp-button <% if(next.theme == "dark"){ %>mp-dark<% } else if(next.theme == "primary"){ %>sp-primary<% } %> <% if(next.theme == "crossbreed" && next.state == "inactive"){ %>mp-flat<% } %> <% if(next.icon){ %>mp-icon<% } %>" <% if((next.theme == "light" || next.theme == "primary") && next.state == "inactive"){ %>disabled<% } %>>' +
+			'<% if(next.icon){ %><span class="mp-arrow mp-arrow-right"></span><% } %>' +
+			'<%= next.label %>' +
+		'</button>' +
+		'<% if(cancel.route != null){ %> <span id="cancel">or Cancel</span><% } %>' +
+	'</div>' +
+'</div>';
+
 Templates.TrackResults = '<div class="title" id="tracks">Tracks</div><ul></ul>';
 Templates.Result = '<li><img src="<%= trackimage %>"><p><span><%= trackname %></span> by <%= trackartists %></p></li>';
 Templates.Search = '<div id="search" id="music"><form><input class="inactive" type="text" value="Search"/></form></div>';

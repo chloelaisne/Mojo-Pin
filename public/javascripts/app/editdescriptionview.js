@@ -1,0 +1,1 @@
+App.EditDescriptionView = Backbone.View.extend({});

@@ -1,4 +1,4 @@
-App.EditTrackView = Backbone.View.extend({
+App.EditMusicView = Backbone.View.extend({
 
 	template: _.template(Templates.EditTrack),
 	
@@ -146,4 +146,4 @@ App.EditTrackView = Backbone.View.extend({
 
 	}
 
-})
+});

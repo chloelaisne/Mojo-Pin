@@ -16,4 +16,4 @@ App.EditLocationView = Backbone.View.extend({
 		return this;
 	}
 
-})
+});

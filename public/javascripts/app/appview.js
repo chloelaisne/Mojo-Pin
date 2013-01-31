@@ -31,7 +31,7 @@ App.AppView = Backbone.View.extend({
 
 	gotoPin: function(e){
 		e.preventDefault();
-		App.router.navigate('/addPin', true);
+		App.router.navigate('/edit/music', true);
 	},
 
 	onClick: function(){

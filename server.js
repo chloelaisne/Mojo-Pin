@@ -47,7 +47,10 @@ var connection = mysql.createConnection(options);
  * Routes.
  */
 
+console.log('test');
+
 app.get('*', function (request, response, next){
+  console.log('index.html');
   if(typeof request.session.id == 'undefined') request.session.id = 1;
   if(request.url.indexOf('/json') == 0) return next();
   fs.readFile(__dirname + '/index.html', 'utf8', function (error, data){
@@ -133,7 +136,6 @@ app.get('/json/pins', function (request, response){
   var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_tracks`) ON (`mp_users`.id = `mp_pins`.user_id AND `mp_locations`.id = `mp_pins`.location_id AND `mp_tracks`.id = `mp_pins`.uri_id)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
-    console.log(JSON.stringify(results));
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');
