@@ -9,29 +9,55 @@ App.EditNavigationView = Backbone.View.extend({
 		"click #cancel"		: "clickCancel"
 	},
 
+	elements: {
+		music 			: 0,
+		location 		: 0,
+		description 	: 0
+	},
+
 	initialize: function()
 	{
-		_.bindAll(this, 'render', 'clickPrevious', 'clickNext', 'clickCancel', 'editMusicViewNavigation', 'editLocationViewNavigation', 'editDescriptionViewNavigation');
+		_.bindAll(this, 'render', 'clickPrevious', 'clickNext', 'clickCancel', 'elementStateChange', 'editMusicViewNavigation', 'editLocationViewNavigation', 'editDescriptionViewNavigation');
+
+		App.Events.on("all", this.elementStateChange);
+	},
+
+	elementStateChange: function(e)
+	{
+		switch(e)
+		{
+			case "EditMusicComplete":
+				this.elements.music = 1;
+				break;
+			case "EditLocationComplete":
+				this.elements.location = 1;
+				break;
+			case "EditDescriptionComplete":
+				this.elements.description = 1;
+				break;
+		}
+
+		this.render();
 	},
 
 	editMusicViewNavigation: function()
 	{
-		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: "active", route: "/user/chloelaisne" };
-		this.next = { label: "Next", theme: "crossbreed", icon: 1, state: "active", route: "edit/location" };
+		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: 1, route: "/user/chloelaisne" };
+		this.next = { label: "Next", theme: "crossbreed", icon: 1, state: this.elements.music, route: "edit/location" };
 		this.cancel = { route: null };
 	},
 
 	editLocationViewNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: "active", route: "edit/music" };
-		this.next = { label: "Next", theme: "light", icon: 1, state: "active", route: "edit/description" };
+		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/music" };
+		this.next = { label: "Next", theme: "light", icon: 1, state: this.elements.location, route: "edit/description" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
 
 	editDescriptionViewNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: "active", route: "edit/location" };
-		this.next = { label: "Done", theme: "primary", icon: 0, state: "inactive", route: "/user/chloelaisne" };
+		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/location" };
+		this.next = { label: "Done", theme: "primary", icon: 0, state: this.elements.description, route: "/user/chloelaisne" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
 
@@ -70,16 +96,16 @@ App.EditNavigationView = Backbone.View.extend({
 
 		switch(Backbone.history.fragment)
 		{
-			case "edit/music":
-				this.editMusicViewNavigation();
-				break;
-
 			case "edit/location":
 				this.editLocationViewNavigation();
 				break;
 
 			case "edit/description":
 				this.editDescriptionViewNavigation();
+				break;
+
+			default:
+				this.editMusicViewNavigation();
 				break;
 		}
 

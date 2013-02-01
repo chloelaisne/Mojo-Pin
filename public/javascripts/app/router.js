@@ -16,6 +16,7 @@ App.Router = Backbone.Router.extend({
 
 		// EDIT SECTION
 		"edit/music"		: "editMusic",
+		"edit/music/:uri"	: "editMusic",
 		"edit/location"		: "editLocation",
 		"edit/description"	: "editDescription"
 	},
@@ -43,8 +44,10 @@ App.Router = Backbone.Router.extend({
         this.view.render();
 	},
 
-	editMusic: function()
+	editMusic: function(uri)
 	{
+		if(uri != undefined)
+			this.views.editMusic.music.set({ uri: uri });
 		this.views.editMusic.render();
 		$('#global').html(this.views.editMusic.el);
 	},

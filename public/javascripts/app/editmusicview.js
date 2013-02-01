@@ -1,149 +1,104 @@
 App.EditMusicView = Backbone.View.extend({
 
-	template: _.template(Templates.EditTrack),
+	template: Templates.EditTrack,
 	
-	initialize: function(){
+	initialize: function()
+	{
+		_.bindAll(this, 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule');
 
-		_.bindAll(this, 'render', 'renderSearch', 'renderPlaying', 'renderDropzone', 'updateTrackURI', 'renderPagination');
+		App.Events.on("onSearchChanged", this.setUri);
 
-		App.Events.on("onSearchChanged", this.updateTrackURI);
+		this.music = new App.Music();
+		this.music.bind("change:uri", this.music.getSpotifyModel);
+		this.music.bind("change:uri", function(){ App.Events.trigger("EditMusicComplete"); });
+		this.music.bind("change:image", this.renderDragDropModule);
 
-		var self = this;
+		this.searchView = new App.SearchView();
 
-		$(function(){
-			Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, self.renderPlaying);
-			Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, self.updateTrackURI);
+		Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, this.renderPlayerModule);
+		
+	},
+
+	setUri: function(uri)
+	{
+		this.music.set
+		({
+			uri: uri
 		});
-
 	},
 
-	updateTrackURI: function(uri){
-		if(typeof uri === 'object')
-			this.trackURI = Spotify.Application.links[0];
-		else 
-			this.trackURI = uri;
-
-		console.log(this.trackURI);
-
-		this.renderDropzone();
-
-		this.renderPagination();
-	},
-
-	renderDropzone: function(){
+	renderDragDropModule: function(){
 
 		if(this.$("#dropzone"))
 			this.$("#dropzone").remove();
 
-		var self = this;
-
-		if(this.trackURI != null){
-
-			self.trackModel = Spotify.Models.Track.fromURI(self.trackURI, function(track){
-
-				self.trackName = track.name;
-				self.trackArtists = track.artists.join(", ");
-				self.trackImage = track.image;
-
-				self.dropzoneSettings = {
-					trackname 		: self.trackName,
-					trackartists 	: self.trackArtists,
-					trackimage 		: self.trackImage
-				};
-
-				self.dropzoneTemplate = _.template(Templates.DropzoneActive)(self.dropzoneSettings);
-
-				$(self.el).append(self.dropzoneTemplate);
-
-				return self;
-			});
+		if(this.music.get("uri") != null)
+		{
+			this.dropzoneSettings =
+			{
+				trackname 		: this.music.get("name"),
+				trackartists 	: this.music.get("artists"),
+				trackimage 		: this.music.get("image")
+			};
+			this.dropzoneTemplate = _.template(Templates.DropzoneActive)(this.dropzoneSettings);
 		}
 		else
 		{
-			self.dropzoneTemplate = _.template(Templates.DropzoneInactive);
+			this.dropzoneTemplate = _.template(Templates.DropzoneInactive);
 
-			$(self.el).append(self.dropzoneTemplate);
-
-			return self;
-		}
-	},
-
-	renderPlaying: function(){
-
-		if(Spotify.Player.playing == true){
-			this.trackName 		= Spotify.Player.track.name;
-			this.trackArtists 	= Spotify.Player.track.artists.join(", ");
-		}
-		else{
-			this.trackName 		= null;
-			this.trackArtists 	= null;
 		}
 
-		var templateSettings = {
-			trackname 		: this.trackName,
-			trackartists 	: this.trackArtists
-		}
-
-		if(this.$(".playing"))
-			this.$(".playing").remove();
-		if(this.trackName != null && this.trackArtists != null)
-			$(this.el).append(_.template(Templates.PlayingTrack)(templateSettings));
-
+		$(this.el).append(this.dropzoneTemplate);
 		return this;
 	},
 
-	renderSearch: function(){
-		this.searchView = new App.SearchView().render();
-
-		var self = this;
-
-		$(function(){
-			$(self.searchView.el).insertAfter("h2");
-		});
-
-		return this;
-	},
-
-	renderPagination: function()
+	renderPlayerModule: function()
 	{
-		var self = this;
+		if(this.$(".player"))
+			this.$(".player").remove();
 
-		if(this.paginationView === undefined)
+		if(Spotify.Player.playing == true)
 		{
-			self.paginationView = new App.PaginationView().render();
-			$(self.el).append(self.paginationView.el);
+			this.playername 	= Spotify.Player.track.name;
+			this.playerartists 	= Spotify.Player.track.artists.join(", ");
 		}
 		else
 		{
-			if(self.trackURI != null)
-			{
-				if($(".right button").hasClass("mp-flat"))
-					$(".right button").removeClass("mp-flat");
-			}
-			else
-			{
-				if(!$(".right button").hasClass("mp-flat"))
-					$(".right button").addClass("mp-flat");
-			}
+			this.playername 	= null;
+			this.playerartists 	= null;
 		}
+
+		var playerTemplateSettings =
+		{
+			trackname 		: this.playername,
+			trackartists 	: this.playerartists
+		}
+
+		if(this.playername != null && this.playerartists != null)
+			$(this.el).append(_.template(Templates.Player)(playerTemplateSettings));
+
 		return this;
 	},
 
+	renderSearchModule: function(){
+		this.searchView.render();
 
-	render: function(){
-
-		this.$el.html(this.template);
-
-		this.renderPlaying();
-
-		this.renderDropzone();
-
-		this.renderSearch();
-
-		this.renderPagination()
+		$(this.el).append(this.searchView.el);
 
 		return this;
+	},
 
+	render: function()
+	{
+		this.setElement(this.template);
+
+		this.renderSearchModule();
+
+		this.renderPlayerModule();
+
+		this.renderDragDropModule();
+
+		return this;
 	}
 
 });

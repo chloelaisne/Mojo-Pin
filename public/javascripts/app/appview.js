@@ -3,45 +3,49 @@ App.AppView = Backbone.View.extend({
 	template: _.template(Templates.App),
 
 	events: {
-		'click #goto-news'		: 'gotoNews',
-		'click #goto-profile'	: 'gotoProfile',
-		'click #goto-friends'	: 'gotoFriends',
-		'click #goto-pin'		: 'gotoPin',
-		'click li'				: 'onClick'
+		'click li'				: 'activeState',
+		'click #goto-news'		: 'showNews',
+		'click #goto-profile'	: 'showProfile',
+		'click #goto-friends'	: 'showFriends',
+		'click #goto-pin'		: 'showEdit'
 	},
 
 	initialize: function(){
-		_.bindAll(this, 'gotoNews', 'gotoProfile', 'gotoFriends', 'gotoPin', 'onClick', 'render');
+		_.bindAll(this, 'activeState', 'showNews', 'showProfile', 'showFriends', 'showEdit', 'render');
+
+		Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, this.linksChanged);
 	},
 
-	gotoNews: function(e){
+	linksChanged: function(){
+		App.router.navigate('/edit/music/' + Spotify.Application.links[0], true);
+	},
+
+	showNews: function(e){
 		e.preventDefault();
 		App.router.navigate('/news', true);
 	},
 
-	gotoProfile: function(e){
+	showProfile: function(e){
 		e.preventDefault();
 		App.router.navigate('/user/chloelaisne', true);
 	},
 
-	gotoFriends: function(e){
+	showFriends: function(e){
 		e.preventDefault();
 		App.router.navigate('/users', true);
 	},
 
-	gotoPin: function(e){
+	showEdit: function(e){
 		e.preventDefault();
 		App.router.navigate('/edit/music', true);
 	},
 
-	onClick: function(){
-		_.each(this.$('li'), function(element, index, list){
-			$(element + '.mp-icon>span').removeClass('active');
-			$(element).removeClass('active');
-		})
+	activeState: function(e){
+		$('nav li').removeClass('active');
+		$('nav li .mp-icon > span').removeClass('active');
 
-		$(event.target + '.mp-icon>span').addClass('active');
-		$(event.target).addClass('active');
+		$(e.target + '.mp-icon > span').addClass('active');
+		$(e.target).addClass('active');
 	},
 
 	render: function(){

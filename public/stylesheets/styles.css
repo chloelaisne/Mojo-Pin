@@ -578,18 +578,18 @@ form input:focus {
 	box-shadow: 0 2px 3px #d5d5d5 inset, 0 1px 2px rgba(94,169,212,1), 0 -1px 2px rgba(94,169,212,1), 1px 0 2px rgba(94,169,212,1), -1px 0 2px rgba(94,169,212,1);
 }
 
-.playing {
+.player {
 	font-size: 11px;
 	color: #a19fa0;
 	text-align: center;
 }
 
-.playing span {
+.player span {
 	color: #f6f0ad;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
 }
 
-.playing .volume {
+.player .volume {
 	width: 12px;
 	height: 12px;
 	display: inline-block;
