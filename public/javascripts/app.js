@@ -3,7 +3,7 @@ window.App = {
 	initialize: function(){
 		this.resizeSidebar();
 		console.log('1');
-		this.mapView = new App.MapView().render();
+//		this.mapView = new App.MapView().render();
 	},
 
 	resizeSidebar: function(){

@@ -10,7 +10,7 @@ App.ConfirmationWindowView = Backbone.View.extend({
 _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.maps.OverlayView.prototype,{
 
 	initialize: function(options){
-		this.setMap(App.mapView.map);
+		this.setMap(this.options.map.map);
 	},
 
 	onAdd: function(){

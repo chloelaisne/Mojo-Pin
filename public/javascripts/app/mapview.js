@@ -1,4 +1,4 @@
-App.MapView = Backbone.View.extend({
+App.MapModuleView = Backbone.View.extend({
 
 	attributes: function(){
 		return {
@@ -15,34 +15,37 @@ App.MapView = Backbone.View.extend({
 
 	},
 	
-	initialize: function(){
-		_.bindAll(this, 'render');
+	initialize: function()
+	{
+		_.bindAll(this, 'setMarker', 'render');
 
 		this.latlng = new google.maps.LatLng(-34.397, 150.644);
 		this.map = new google.maps.Map(this.el, this.options);
 		this.map.setCenter(this.latlng);
-
-		/*this.marker = new google.maps.Marker({
-			position	: this.latlng,
-			map			: this.map
-		});
-
-		this.markerWindowView = new App.NoticeWindowView({
-			map 		: this.map,
-			latlng 		: this.latlng,
-			title		: 'Middle Of The Bed',
-			artists		: 'Lucy Rose',
-			location	: 'Betahaus, Kreuzberg'
-		});*/
 	},
 
-	render: function(){
+	setMarker: function(model)
+	{
+		console.log("latitude", model.latitude);
+		console.log("longitude", model.longitude);
+		console.log("map", model.map);
+
+		this.position = new google.maps.LatLng(model.latitude, model.longitude);
+		this.markerOptions = {
+			position: this.position,
+			map: model.map.map
+		};
+		this.marker = new google.maps.Marker(this.markerOptions);
+		this.map.setCenter(this.position);
+		this.confirmationWindowView = new App.ConfirmationWindowView({ map: model.map, latlng: this.position });
+	},
+
+	render: function()
+	{
 		$(this.el).css({
-			position: "absolute",
 			width: "100%",
 			height: "500px"
 		});
-		$("body").prepend(this.el);
 
 		return this;
 	}

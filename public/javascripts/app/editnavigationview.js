@@ -10,9 +10,9 @@ App.EditNavigationView = Backbone.View.extend({
 	},
 
 	elements: {
-		music 			: 0,
-		location 		: 0,
-		description 	: 0
+		music 			: false,
+		location 		: false,
+		description 	: false
 	},
 
 	initialize: function()
@@ -27,13 +27,13 @@ App.EditNavigationView = Backbone.View.extend({
 		switch(e)
 		{
 			case "EditMusicComplete":
-				this.elements.music = 1;
+				this.elements.music = true;
 				break;
 			case "EditLocationComplete":
-				this.elements.location = 1;
+				this.elements.location = true;
 				break;
 			case "EditDescriptionComplete":
-				this.elements.description = 1;
+				this.elements.description = true;
 				break;
 		}
 
@@ -63,8 +63,9 @@ App.EditNavigationView = Backbone.View.extend({
 
 	clickPrevious: function(e)
 	{
+		console.log("Previous", this.previous.route);
 		e.preventDefault();
-		if(this.previous.route != null && this.previous.state == "active")
+		if(this.previous.route != null && this.previous.state == true)
 		{
 			App.router.navigate(this.previous.route, true);
 		}
@@ -72,8 +73,9 @@ App.EditNavigationView = Backbone.View.extend({
 
 	clickNext: function(e)
 	{
+		console.log("Next", this.next.route);
 		e.preventDefault();
-		if(this.next.route != null && this.next.state == "active")
+		if(this.next.route != null && this.next.state == true)
 		{
 			App.router.navigate(this.next.route, true);
 		}

@@ -551,6 +551,7 @@ nav ul li.active {
 form {
 	position: relative;
 	text-align: center;
+	z-index: 10;
 }
 
 form input {
@@ -563,6 +564,7 @@ form input {
 	font-size: 11px;
 	padding: 0 10px 0 28px;
 	background: #ffffff url(../images/search_icon-large.png) no-repeat 5px 3px;
+	cursor: text;
 }
 
 form input.inactive {

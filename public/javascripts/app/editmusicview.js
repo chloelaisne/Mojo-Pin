@@ -13,7 +13,7 @@ App.EditMusicView = Backbone.View.extend({
 		this.music.bind("change:uri", function(){ App.Events.trigger("EditMusicComplete"); });
 		this.music.bind("change:image", this.renderDragDropModule);
 
-		this.searchView = new App.SearchView();
+		this.searchMusicModuleView = new App.SearchMusicModuleView();
 
 		Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, this.renderPlayerModule);
 		
@@ -81,9 +81,9 @@ App.EditMusicView = Backbone.View.extend({
 	},
 
 	renderSearchModule: function(){
-		this.searchView.render();
+		this.searchMusicModuleView.render();
 
-		$(this.el).append(this.searchView.el);
+		$(this.el).append(this.searchMusicModuleView.el);
 
 		return this;
 	},

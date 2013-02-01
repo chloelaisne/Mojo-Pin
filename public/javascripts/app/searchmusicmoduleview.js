@@ -1,4 +1,4 @@
-App.SearchView = Backbone.View.extend({
+App.SearchMusicModuleView = Backbone.View.extend({
 
 	events: {
 		"keypress input"	: "onKeyPress",

@@ -1,1 +1,0 @@
-App.ResultsLocationCollection = Backbone.Collection.extend({});

@@ -1,0 +1,1 @@
+App.LocationsCollection = Backbone.Collection.extend({});
