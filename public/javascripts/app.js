@@ -1,9 +1,17 @@
 window.App = {
 
-	initialize: function(){
-		this.resizeSidebar();
-		console.log('1');
-//		this.mapView = new App.MapView().render();
+	OFFLINE: 2,
+
+	ONLINE: 1,
+
+	initialize: function()
+	{
+		//this.resizeSidebar();
+		this.loadMaps();
+	},
+
+	loadMaps: function()
+	{
 	},
 
 	resizeSidebar: function(){

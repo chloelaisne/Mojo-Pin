@@ -1,5 +1,13 @@
 /* Main elements */
 
+#removeMarker {
+	z-index: 1000;
+}
+
+#removeMarker:hover {
+	cursor: pointer;
+}
+
 html, body {
 	height: 100%;
 }
@@ -21,6 +29,17 @@ body {
 	font-weight: 300;
 	font-size: 12px;
 	text-shadow: none;
+}
+
+body.offline {
+	background-color: #ecebe8;
+	color: #767574;
+	font-family: "Helvetica", "Arial", sans-serif;
+	font-size: 18px;
+	font-weight: bold;
+	text-shadow: 0 1px 0 #ffffff;
+	text-align: center;
+	padding-top: 250px;
 }
 
 h1, h2, h3, h4, h5, h6 {

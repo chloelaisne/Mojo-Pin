@@ -47,8 +47,6 @@ var connection = mysql.createConnection(options);
  * Routes.
  */
 
-console.log('test');
-
 app.get('*', function (request, response, next){
   console.log('index.html');
   if(typeof request.session.id == 'undefined') request.session.id = 1;

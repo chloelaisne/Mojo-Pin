@@ -4,17 +4,14 @@ App.Router = Backbone.Router.extend({
 
 	routes:
 	{
+		'news': 'news',
 
-		// DEFAULT
-		''			: 'news',
+		""					: "news",
+		"offline"			: "showOffline",
 
-		'news'			: 'news',
-		'users'			: 'users',
-		'user/*user'	: 'user',
-		'addPin'		: 'addPin',
-		'editLocation'	: 'routeToEditLocation',
+		"users"				: "users",
+		"user/*user"		: "user",
 
-		// EDIT SECTION
 		"edit/music"		: "editMusic",
 		"edit/music/:uri"	: "editMusic",
 		"edit/location"		: "editLocation",
@@ -23,14 +20,17 @@ App.Router = Backbone.Router.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'news', 'users', 'user', 'editMusic', 'editLocation', 'editDescription');
+		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'editMusic', 'editLocation', 'editDescription');
 
-		this.views.app = new App.AppView({ el: $("body") });
+		App.Events.on("StateChanged", this.setBody);
+
+		this.views.app 				= new App.AppView({ el: $("body") });
+		this.views.offline 			= new App.OfflineView({ el: $("body") });
+
 		this.views.news = new App.NewsView();
 		this.views.user = new App.UserView();
 		this.views.friends = new App.FriendsView();
 
-		// EDIT SECTION
 		this.views.editNavigation 	= new App.EditNavigationView();
 		this.views.editMusic 		= new App.EditMusicView();
 		this.views.editLocation 	= new App.EditLocationView();
@@ -40,12 +40,44 @@ App.Router = Backbone.Router.extend({
 		this.bind("route:editLocation", this.views.editNavigation.render);
 		this.bind("route:editDescription", this.views.editNavigation.render);
 
-		this.view = this.views.app;        
+		this.showOnline();
+	},
+
+	setBody: function(state)
+	{
+		console.log();
+		if(state == App.OFFLINE)
+		{
+			this.views.app.model.set({ classname: 'offline' });
+        	this.view = this.views.offline;
+        	this.view.render();
+        	this.history = { back: Backbone.history.fragment };
+        	this.navigate('showOffline', true);
+
+		}
+		else if(state == App.ONLINE)
+		{
+			this.views.app.model.set({ classname: '' });
+			this.view = this.views.app;
+        	this.view.render();
+        	this.navigate(this.history.back, true);
+		}
+	},
+
+	showOnline: function()
+	{
+		this.view = this.views.app;
         this.view.render();
+	},
+
+	showOffline: function()
+	{
+		
 	},
 
 	editMusic: function(uri)
 	{
+		console.log('HALLO');
 		if(uri != undefined)
 			this.views.editMusic.music.set({ uri: uri });
 		this.views.editMusic.render();
@@ -85,14 +117,6 @@ App.Router = Backbone.Router.extend({
 
 		this.views.user.render();
 		$('#global').html(this.views.user.el);
-	},
-
-	addPin: function()
-	{
-		this.views.editNavigation.unrender();
-
-		this.views.editTrack.render();
-		$('#global').html(this.views.editTrack.el);
 	}
 
 });

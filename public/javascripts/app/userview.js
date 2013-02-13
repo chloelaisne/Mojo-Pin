@@ -8,7 +8,7 @@ App.UserView = Backbone.View.extend({
 		_.bindAll(this, 'render');
 
 		this.activitiesView = new App.ActivitiesView();
-		this.mapView = new App.MapModuleView();
+		//this.mapView = new App.MapModuleView();
 	},
 
 	render: function(){

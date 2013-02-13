@@ -30,7 +30,7 @@ App.EditLocationView = Backbone.View.extend({
 	{
 		if(model != undefined)
 		{
-			this.mapModuleView.setMarker(model);
+			this.mapModuleView.addMarker(model);
 		}
 		$(this.el).prepend((this.mapModuleView.render()).el);
 	},

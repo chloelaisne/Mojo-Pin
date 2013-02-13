@@ -1,5 +1,4 @@
 $(function(){
-
 	Backbone.emulateJSON = true;
 
 	// Initialize the Backbone router.
