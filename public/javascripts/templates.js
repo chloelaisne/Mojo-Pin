@@ -28,10 +28,18 @@ Templates.EditTrack = '<h2>Pin a new track or playlist to your memory map</h2>';
 Templates.DropzoneInactive = '<div id="dropzone" class="blank"><p><span class="mp-drop"></span>Drag & Drop any playlist</p></div>';
 Templates.DropzoneActive = '<div id="dropzone"><div class="cover" style="background-size: 100% 100%; background-image: url(<%= trackimage %>);"></div><div class="meta"><div class="track-name"><%= trackname %></div><div class="artist-name"><%= trackartists %></div></div></div>';
 Templates.SearchLocation = '<div id="page-bottom"><div class="search" id="location"><form><input type="text" /></form><div id="results"></div></div></div>';
-Templates.EditDescription = '';
-Templates.Pagination = '<div class="pagination"><div class="left"><button class="sp-button mp-dark">Cancel</button></div><div class="right"><button class="sp-button mp-flat mp-icon"><span class="mp-arrow mp-arrow-right"></span>Next</button></div></div>';
 
-// EDIT SECTION
+Templates.EditDescription = '<div id="page-bottom">' +
+								'<form>' +
+									'<textarea>Message (Optional)</textarea>' +
+								'</form>' +
+								'<div class="social">' +
+									'Share to' +
+									'<div class="buttons">' +
+										'<button class="sp-button sp-icon mp-social active"><span class="mp-facebook"></span>Facebook</button>' +
+									'</div>' +
+								'</div>' +
+							'</div>';
 
 Templates.Player = 			'<div class="player">Use currently playing:<span><span class="volume on"></span><%= trackname %> by <%= trackartists %></span></div>'
 

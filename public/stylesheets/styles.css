@@ -1,4 +1,12 @@
-/* Main elements */
+/*
+ *
+ * GLOBAL HTML ELEMENTS
+ *
+ */
+
+
+
+
 
 #removeMarker {
 	z-index: 1000;
@@ -55,7 +63,19 @@ h2 {
 	margin: 80px 0 75px 0;
 }
 
-/* Icons */
+
+
+
+
+/*
+ *
+ * ICONS
+ *
+ */
+
+
+
+
 
 .mp-track {
 	float: left;
@@ -169,7 +189,42 @@ h2 {
 	cursor: url(../images/openhand.cur), default !important;
 }
 
-/* Buttons */
+
+.mp-facebook {
+	background: transparent url(../images/social_icons.png) no-repeat 0 -16px !important;
+	width: 16px !important;
+	height: 16px !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	display: block !important;
+	float: left !important;
+	position: absolute !important;
+}
+
+.mp-twitter {
+	background: transparent url(../images/social_icons.png) no-repeat 0 0 !important;
+	width: 16px !important;
+	height: 16px !important;
+	overflow: hidden !important;
+	padding: 0 !important;
+	display: block !important;
+	float: left !important;
+	position: absolute !important;
+}
+
+
+
+
+
+/*
+ *
+ * BUTTONS
+ *
+ */
+
+
+
+
 
 .sp-button.mp-flat {
 	border-width: 0;
@@ -192,10 +247,34 @@ h2 {
 	-webkit-border-image: url(../images/dark_button.png) 25 5 24 5;
 }
 
+.mp-social {
+	-webkit-border-image: url(../images/light_button.png) 0 5 25 5;
+	border-width: 0 5px;
+	height: 25px;
+	color: #3f3f3f;
+	font-size: 11px;
+	text-shadow: 0 1px 0 #ffffff;
+	padding: 2px;
+	padding-left: 20px;
+	font-weight: bold;
+	position: relative;
+}
+
+.mp-social.active {
+	-webkit-border-image: url(../images/light_button.png) 25 5 0 5;
+	border-width: 0 5px;
+	color: #ffffff;
+	text-shadow: 0 1px 0 #000000;
+}
 
 
 
-/* Header */
+
+/*
+ *
+ * HEADER
+ *
+ */
 
 #header {
 	background: transparent url(../images/header_background.png) no-repeat center 32px;
@@ -273,8 +352,6 @@ nav ul li.active {
 	color: #dcdcdc;
 }
 
-/* Global */
-
 #global {
 	width: 100%;
 	position: relative;
@@ -283,7 +360,20 @@ nav ul li.active {
 	background-color: #373737;
 }
 
-/* Profile View */
+
+
+
+
+/*
+ *
+ * GLOBAL HTML ELEMENTS
+ *
+ */
+
+
+
+
+
 
 #top {
 	width: 100%;
@@ -379,7 +469,19 @@ nav ul li.active {
 	padding-left: 20px;
 }
 
-/* Map */
+
+
+
+
+/*
+ *
+ * GOOGLE MAPS
+ *
+ */
+
+
+
+
 
 #map {
 	width: 100%;
@@ -439,7 +541,19 @@ nav ul li.active {
 	font-size: 11px;
 }
 
-/* Friends */
+
+
+
+
+/*
+ *
+ * FRIENDS
+ *
+ */
+
+
+
+
 
 #filter {
 	width: 100%;
@@ -530,7 +644,19 @@ nav ul li.active {
 	cursor: pointer;
 }
 
-/* New Track View */
+
+
+
+
+/*
+ *
+ * MUSIC
+ *
+ */
+
+
+
+
 
 .search#location {
 	position: relative;
@@ -685,8 +811,6 @@ form input:focus {
 	text-align: center;
 }
 
-/* Search Music view */
-
 .search form {
 	margin: 0 auto;
 	padding: 0;
@@ -763,8 +887,6 @@ form input:focus {
 	color: #424242;
 }
 
-/* Search location view */
-
 
 #page-bottom {
 	position: fixed;
@@ -781,74 +903,14 @@ form input:focus {
 	margin: 0 auto;
 }
 
-
-
-
-
-
-
-
-
-
-/* Buttons */
-
-.sp-icon.mp-social {
-	-webkit-border-image: url(../images/light_button.png) 0 5 25 5;
-	border-width: 0 5px;
-	height: 25px;
-	color: #3f3f3f;
-	font-size: 11px;
-	text-shadow: 0 1px 0 #ffffff;
-	padding: 2px;
-	padding-left: 20px;
-	font-weight: bold;
-	position: relative;
-}
-
-.sp-icon.mp-social:hover {
-	-webkit-border-image: url(../images/light_button.png) 25 5 0 5;
-	border-width: 0 5px;
-	height: 25px;
-	color: #ffffff;
-	font-size: 11px;
-	text-shadow: 0 1px 0 #000000;
-}
-
-.sp-icon.mp-social span {
-	background-color: transparent;
-	background-image: url(../images/social_icons.png);
-	background-attachment: no-repeat;
-	width: 16px;
-	height: 16px;
-	overflow: hidden;
-	padding: 0;
-	display: block;
-	float: left;
-	position: absolute;
-}
-
-span.mp-facebook {
-	background-position: 0 -16px;
-}
-
-span.mp-twitter {
-	background-position: 0 0;
-}
-
-.social {
-	color: #636363;
-	font-weight: bold;
-	font-size: 12px;
-	text-shadow: 0 1px 0 rgba(255,255,255, 1);
-}
-
-.social .buttons {
-	margin-top: 5px;
+body.description #page-bottom {
+	height: 132px;
+	padding: 10px 0 12px 0;
 }
 
 textarea {
-	width: 329px;
-	height: 73px;
+	width: 314px;
+	height: 59px;
 	background-color: #ffffff;
 	border: 1px solid #b3b3b3;
 	border-radius: 3px;
@@ -856,43 +918,28 @@ textarea {
 	color: #a9a9a9;
 	font-size: 12px;
 	box-shadow: 0 1px 0 #e5e5e5 inset;
-	margin: 3px 0 7px 0;
 }
+
+.social {
+	color: #636363;
+	font-weight: bold;
+	font-size: 12px;
+	text-shadow: 0 1px 0 rgba(255,255,255, 1);
+	width: 329px;
+	margin: 0 auto;
+}
+
+.social .buttons {
+	margin-top: 5px;
+}
+
+
+
 
 
 
 nav ul li.mp-icon {
 	padding: 0 5px 0 21px;
-}
-
-
-/*********** Section ***********/
-
-.section {
-	width: 100%;
-	height: 100%;
-	position:fixed;
-	top: 0;
-	left: 0;
-	padding: 70px 0 0 0; 
-}
-
-.section .content {
-	width: 100%;
-	height: 100%;
-}
-
-.section.music {
-
-}
-
-.section.location,
-.section.description {
-	padding: 0;
-}
-
-.section.profile {
-	padding-top: 50px;
 }
 
 /*********** PAGINATION ***********/

@@ -80,18 +80,21 @@ App.Router = Backbone.Router.extend({
 			this.views.editMusic.music.set({ uri: uri });
 		this.views.editMusic.render();
 		$('#global').html(this.views.editMusic.el);
+		this.views.app.model.set({ classname: 'music' });
 	},
 
 	editLocation: function()
 	{
 		this.views.editLocation.render();
 		$('#global').html(this.views.editLocation.el);
+		this.views.app.model.set({ classname: 'location' });
 	},
 
 	editDescription: function()
 	{
 		this.views.editDescription.render();
 		$('#global').html(this.views.editDescription.el);
+		this.views.app.model.set({ classname: 'description' });
 	},
 
 	news: function()
