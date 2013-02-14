@@ -45,7 +45,6 @@ App.Router = Backbone.Router.extend({
 
 	setBody: function(state)
 	{
-		console.log();
 		if(state == App.OFFLINE)
 		{
 			this.views.app.model.set({ classname: 'offline' });
@@ -77,7 +76,6 @@ App.Router = Backbone.Router.extend({
 
 	editMusic: function(uri)
 	{
-		console.log('HALLO');
 		if(uri != undefined)
 			this.views.editMusic.music.set({ uri: uri });
 		this.views.editMusic.render();

@@ -12,13 +12,13 @@ App.EditLocationView = Backbone.View.extend({
 
 	setLocation: function(model)
 	{
-
 		this.location = new App.Location
 		({
 			description	: model.description,
 			reference	: model.reference,
 			map 		: this.mapModuleView
 		});
+		App.Events.trigger("EditLocationComplete");
 	},
 
 	renderSearchModule: function()

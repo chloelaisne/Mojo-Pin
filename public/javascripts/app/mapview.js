@@ -11,6 +11,8 @@
 		{
 			_.bindAll(this, 'addMarker', 'removeMarker', 'render');
 
+			App.Events.on("RemoveMarker", this.removeMarker);
+
 			this.options =
 			{
 				MapTypeId			: google.maps.MapTypeId.ROADMAP,
@@ -39,9 +41,7 @@
 		addMarker: function(model)
 		{
 			this.removeMarker();
-
-			this.position = new google.maps.LatLng(62.323907, -150.109291);
-			//this.position = new google.maps.LatLng(model.latitude, model.longitude);
+			this.position = new google.maps.LatLng(model.latitude, model.longitude);
 			this.markerOptions = {
 				position: this.position,
 				map: model.map.map

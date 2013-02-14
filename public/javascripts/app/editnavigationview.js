@@ -12,7 +12,7 @@ App.EditNavigationView = Backbone.View.extend({
 	elements: {
 		music 			: false,
 		location 		: false,
-		description 	: false
+		description 	: true
 	},
 
 	initialize: function()
@@ -63,7 +63,6 @@ App.EditNavigationView = Backbone.View.extend({
 
 	clickPrevious: function(e)
 	{
-		console.log("Previous", this.previous.route);
 		e.preventDefault();
 		if(this.previous.route != null && this.previous.state == true)
 		{
@@ -73,7 +72,6 @@ App.EditNavigationView = Backbone.View.extend({
 
 	clickNext: function(e)
 	{
-		console.log("Next", this.next.route);
 		e.preventDefault();
 		if(this.next.route != null && this.next.state == true)
 		{

@@ -22,11 +22,12 @@ App.SearchLocationModuleView = Backbone.View.extend({
 		({
 			type 		: 'GET',
 			dataType 	: 'json',
-			url 		: 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=' + $(e.target).val() + '&types=geocode&sensor=true&key=AIzaSyCy57ndHPnW1X3zYFFnBkdvJoJ-OW8Krsc',
-			success		: function(data, textStatus, jqXHR){
-				self.locationsCollection.reset(data.predictions);
-			}
-		});
+			url 		: 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=' + $(e.target).val() + '&types=geocode&sensor=true&key=AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ',
+		})
+		.done(function(data, textStatus, jqXHR){
+			self.locationsCollection.reset(data.predictions);
+		})
+		.fail(function(jqXHR, textStatus, errorThrown){});
 	},
 
 	renderCollection: function()
