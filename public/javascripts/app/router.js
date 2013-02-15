@@ -6,21 +6,22 @@ App.Router = Backbone.Router.extend({
 	{
 		'news': 'news',
 
-		""					: "news",
+		""					: "edit",
 		"offline"			: "showOffline",
 
 		"users"				: "users",
 		"user/*user"		: "user",
 
-		"edit/music"		: "editMusic",
+		"edit/*action"		: "edit",
+		/*"edit/music"		: "editMusic",
 		"edit/music/:uri"	: "editMusic",
 		"edit/location"		: "editLocation",
-		"edit/description"	: "editDescription"
+		"edit/description"	: "editDescription"*/
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'editMusic', 'editLocation', 'editDescription');
+		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'edit'/*, 'editMusic', 'editLocation', 'editDescription'*/);
 
 		App.Events.on("StateChanged", this.setBody);
 
@@ -31,14 +32,18 @@ App.Router = Backbone.Router.extend({
 		this.views.user = new App.UserView();
 		this.views.friends = new App.FriendsView();
 
-		this.views.editNavigation 	= new App.EditNavigationView();
+		this.views.edit				= new App.EditView();
+		this.bind("route:edit", this.views.edit.editNavigation.render);
+
+
+		/*this.views.editNavigation 	= new App.EditNavigationView();
 		this.views.editMusic 		= new App.EditMusicView();
 		this.views.editLocation 	= new App.EditLocationView();
 		this.views.editDescription 	= new App.EditDescriptionView();
 
 		this.bind("route:editMusic", this.views.editNavigation.render);
 		this.bind("route:editLocation", this.views.editNavigation.render);
-		this.bind("route:editDescription", this.views.editNavigation.render);
+		this.bind("route:editDescription", this.views.editNavigation.render);*/
 
 		this.showOnline();
 	},
@@ -74,7 +79,30 @@ App.Router = Backbone.Router.extend({
 		
 	},
 
-	editMusic: function(uri)
+	edit: function(action)
+	{
+		this.views.edit.render();
+		$('#global').html(this.views.edit.el);
+
+		switch(action)
+		{
+			case 'music':
+				this.views.edit.renderEditMusic();
+				this.views.app.model.set({ classname: 'music' });
+			break;
+			case 'location':
+				this.views.edit.renderEditLocation();
+				this.views.app.model.set({ classname: 'location' });
+			break;
+			case 'description':
+				this.views.edit.renderEditDescription();
+				this.views.app.model.set({ classname: 'description' });
+			break;
+		}
+
+	},
+
+	/*editMusic: function(uri)
 	{
 		if(uri != undefined)
 			this.views.editMusic.music.set({ uri: uri });
@@ -95,7 +123,7 @@ App.Router = Backbone.Router.extend({
 		this.views.editDescription.render();
 		$('#global').html(this.views.editDescription.el);
 		this.views.app.model.set({ classname: 'description' });
-	},
+	},*/
 
 	news: function()
 	{

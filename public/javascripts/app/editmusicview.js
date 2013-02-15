@@ -1,6 +1,4 @@
 App.EditMusicView = Backbone.View.extend({
-
-	template: Templates.EditTrack,
 	
 	initialize: function()
 	{
@@ -90,7 +88,7 @@ App.EditMusicView = Backbone.View.extend({
 
 	render: function()
 	{
-		this.setElement(this.template);
+		$(this.el).append(Templates.EditMusic);
 
 		this.renderSearchModule();
 
