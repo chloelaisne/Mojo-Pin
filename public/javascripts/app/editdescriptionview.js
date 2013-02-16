@@ -3,16 +3,15 @@ App.EditDescriptionView = Backbone.View.extend({
 	initialize: function()
 	{
 		_.bindAll(this, 'resizeView', 'renderDescriptionModule', 'renderMapModule', 'render')
-		this.mapModuleView = new App.MapModuleView();
+		this.mapModuleView = new App.MapModuleView({ id: "map_description" });
 
-		$(window).bind("load", this.resizeView);
 		$(window).bind("resize", this.resizeView);
 	},
 
 	resizeView: function()
 	{
 		var height = $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight();
-		$("#map_canvas").height(height);
+		$("#map_description").height(height);
 	},
 
 	renderDescriptionModule: function()

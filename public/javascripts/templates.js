@@ -1,7 +1,5 @@
 Templates = 					{};
 
-// GLOBAL
-
 Templates.App = 				'<div id="header"></div>' +
 								'<div id="global"></div>';
 
@@ -70,15 +68,16 @@ Templates.SearchLocation = 		'<div id="page-bottom">' +
 									'</div>' +
 								'</div>';
 
+Templates.SearchMusic = 		'<div id="search" id="music">' +
+									'<form>' +
+										'<input class="inactive" type="text" value="Search"/>' +
+									'</form>' +
+								'</div>';
 
 
 Templates.Activity = '<div class="music"><span class="<%= type %>"></span><b><%= title %></b> by <%= artists %></div><div class="location"><%= location %></div>';
 Templates.User = '<div id="top"><div class="picture"></div><div class="information"><div class="name">Chloé Laisné</div><div class="statistics"><span class="mp-disc"></span>9 memories</div></div></div><div id="sidebar"></div><div id="map"></div>';
 Templates.Friend = '<li style="display:<%= display %>"><div class="picture"><img src="<%= picture %>" alt="<%= name %>\'s profile picture"/><button class="sp-button">Send Invitation</button></div><a><span><%= name %></span></a></li>';
 Templates.Friends = '<div><form id="filter"><input type="text" value="Filter"/></form><ul class="friendslist"></ul></div>';
-
-
-
 Templates.TrackResults = '<div class="title" id="tracks">Tracks</div><ul></ul>';
 Templates.Result = '<li><img src="<%= trackimage %>"><p><span><%= trackname %></span> by <%= trackartists %></p></li>';
-Templates.Search = '<div id="search" id="music"><form><input class="inactive" type="text" value="Search"/></form></div>';

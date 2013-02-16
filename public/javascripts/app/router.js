@@ -12,16 +12,12 @@ App.Router = Backbone.Router.extend({
 		"users"				: "users",
 		"user/*user"		: "user",
 
-		"edit/*action"		: "edit",
-		/*"edit/music"		: "editMusic",
-		"edit/music/:uri"	: "editMusic",
-		"edit/location"		: "editLocation",
-		"edit/description"	: "editDescription"*/
+		"edit/*action"		: "edit"
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'edit'/*, 'editMusic', 'editLocation', 'editDescription'*/);
+		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'edit');
 
 		App.Events.on("StateChanged", this.setBody);
 
@@ -34,16 +30,6 @@ App.Router = Backbone.Router.extend({
 
 		this.views.edit				= new App.EditView();
 		this.bind("route:edit", this.views.edit.editNavigation.render);
-
-
-		/*this.views.editNavigation 	= new App.EditNavigationView();
-		this.views.editMusic 		= new App.EditMusicView();
-		this.views.editLocation 	= new App.EditLocationView();
-		this.views.editDescription 	= new App.EditDescriptionView();
-
-		this.bind("route:editMusic", this.views.editNavigation.render);
-		this.bind("route:editLocation", this.views.editNavigation.render);
-		this.bind("route:editDescription", this.views.editNavigation.render);*/
 
 		this.showOnline();
 	},
@@ -82,70 +68,42 @@ App.Router = Backbone.Router.extend({
 	edit: function(action)
 	{
 		this.views.edit.render();
-		$('#global').html(this.views.edit.el);
+		//$('#global').html(this.views.edit.el);
 
 		switch(action)
 		{
-			case 'music':
-				this.views.edit.renderEditMusic();
-				this.views.app.model.set({ classname: 'music' });
+			case 'description':
+				this.views.edit.renderEditDescription();
+				this.views.app.model.set({ classname: 'description' });
 			break;
 			case 'location':
 				this.views.edit.renderEditLocation();
 				this.views.app.model.set({ classname: 'location' });
 			break;
-			case 'description':
-				this.views.edit.renderEditDescription();
-				this.views.app.model.set({ classname: 'description' });
+			default:
+				this.views.edit.renderEditMusic();
+				this.views.app.model.set({ classname: 'music' });
 			break;
 		}
 
 	},
 
-	/*editMusic: function(uri)
-	{
-		if(uri != undefined)
-			this.views.editMusic.music.set({ uri: uri });
-		this.views.editMusic.render();
-		$('#global').html(this.views.editMusic.el);
-		this.views.app.model.set({ classname: 'music' });
-	},
-
-	editLocation: function()
-	{
-		this.views.editLocation.render();
-		$('#global').html(this.views.editLocation.el);
-		this.views.app.model.set({ classname: 'location' });
-	},
-
-	editDescription: function()
-	{
-		this.views.editDescription.render();
-		$('#global').html(this.views.editDescription.el);
-		this.views.app.model.set({ classname: 'description' });
-	},*/
-
 	news: function()
 	{
-		this.views.editNavigation.unrender();
-
-		this.views.news.render();
-		$('#global').html(this.views.news.el);
+		//this.views.editNavigation.unrender();
+		$('#global').html((this.views.news.render()).el);
 	},
 
 	users: function()
 	{
-		this.views.editNavigation.unrender();
-
+		//this.views.editNavigation.unrender();
 		$('#global').html((this.views.friends.render()).el);
 	},
 
 	user: function()
 	{
-		this.views.editNavigation.unrender();
-
-		this.views.user.render();
-		$('#global').html(this.views.user.el);
+		//this.views.editNavigation.unrender();
+		$('#global').html((this.views.user.render()).el);
 	}
 
 });

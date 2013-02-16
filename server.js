@@ -140,7 +140,7 @@ app.get('/json/pins', function (request, response){
   });
 });
 
-// Retrieve defined pin
+// Retrieve existing pin
 app.get('/json/pin/:pin_id', function (request, response){
   var query = "SELECT * FROM `mp_pins` WHERE `id` = " + connection.escape(request.params.pin_id);
   connection.query(query, function (error, results, fields){
@@ -152,50 +152,46 @@ app.get('/json/pin/:pin_id', function (request, response){
 });
 
 // Create new pin
-app.get('/json/pin/:type/:latlng/:uri/:caption', function (request, response){
+app.post('/json/pin', function (request, response){
 
-  var user_id = 1;
-  var location_id = null;
-  var uri_id = null;
-  var type = null;
-  if(request.params.type == 'playlist')
-    type = 'mp_playlists';
-  else if(request.params.type == 'track')
-    type = 'mp_tracks';
+  var location_id   = null;
+  var music_id      = null;
 
-  // Enter location in the database: mp_locations
+  // Enter location in database: mp_locations
   // Or retrieve location identifier if location already exists
-  connection.query("SELECT * FROM `mp_locations` WHERE `latlng` = '" + request.params.latlng + "' LIMIT 0, 1", function (error, results){
+  connection.query("SELECT * FROM `mp_locations` WHERE `reference` = '" + request.body.reference + "' LIMIT 0, 1", function (error, results){
     if(error) throw error;
     if(!results.length){
-      connection.query("INSERT INTO `" + database + "`.`mp_locations`(`id`, `latlng`) VALUES(NULL, '" + request.params.latlng + "')", function (error, results){
+      var parameters = [request.body.location_latitude, request.body.location_longitude, request.body.location_reference, request.body.location_description];
+      var query = "INSERT INTO `" + database + "`.`mp_locations`(`id`, `latitude`, `longitude`, `reference`, `description`) VALUES(NULL, ?, ?, ?, ?)";
+      connection.query(query, parameters, function (error, results){
         if(error) throw error;
         location_id = results.insertId;
-        console.log('Location entry inserted successfully in the database: ' + request.params.latlng);
+        console.log('Location entry inserted successfully in the database: ' + request.body.description);
       });
     } else{
-      console.log('Location entry already exists in the database: ' + request.params.latlng);
+      console.log('Location entry already exists in the database: ' + request.body.latlng);
       location_id = results[0].id;
     }
   });
 
-  // Enter URI in the database: mp_tracks or mp_playlists
-  // Or retrieve URI identifier if URI already exists
-  connection.query("SELECT * FROM `" + type + "` WHERE `spotify_uri` = '" + request.params.uri + "' LIMIT 0, 1", function (error, results){
+  // Enter URI in database: mp_music
+  // Or retrieve music identifier if music already exists
+  connection.query("SELECT * FROM `mp_music` WHERE `uri` = '" + request.body.music_uri + "' LIMIT 0, 1", function (error, results){
     if(error) throw error;
     if(!results.length){
-      connection.query("INSERT INTO `" + database + "`.`" + type + "`(`id`, `spotify_uri`) VALUES(NULL, '" + request.params.uri + "')", function (error, results){
+      connection.query("INSERT INTO `" + database + "`.`mp_musics`(`id`, `uri`) VALUES(NULL, '" + request.body.music_uri + "')", function (error, results){
         if(error) throw error;
-        uri_id = results.insertId;
-        console.log(request.params.type + ' entry inserted successfully in the database: ' + request.params.uri);
+        music_id = results.insertId;
+        console.log('Music entry inserted successfully in the database: ' + request.body.music_uri);
       });
     } else{
-      console.log(request.params.type + ' entry already exists in the database: ' + request.params.uri);
-      uri_id = results[0].id;
+      console.log('Music entry already exists in the database: ' + request.body.music_uri);
+      music_id = results[0].id;
     }
   });
 
-  // Location and URI queries executed and mySQL connection terminated
+  // Terminate MySQL connection to execute location and music queries
   connection.end(function(){
     // Restart the mySQL connection
     connection = mysql.createConnection({
@@ -204,9 +200,9 @@ app.get('/json/pin/:type/:latlng/:uri/:caption', function (request, response){
       password: password,
       database: database
     });
-    // Enter pin entry in the database: mp_pins
-    var parameters = [request.params.type, request.params.caption, user_id, location_id, uri_id];
-    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id`, `type`, `caption`, `user_id`, `location_id`, `uri_id`) VALUES(NULL, ?, ?, ?, ?, ?)";
+    // Enter pin entry in database: mp_pins
+    var parameters = [request.body.description, user_id, location_id, music_id];
+    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id`, `description`, `user_id`, `location_id`, `music_id`) VALUES(NULL, ?, ?, ?, ?)";
     connection.query(query, parameters, function (error, results){
       if(error) throw error;
       console.log('Pin entry inserted successfully in the database: ');

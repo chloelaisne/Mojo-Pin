@@ -91,7 +91,6 @@ App.EditNavigationView = Backbone.View.extend({
 
 	render: function()
 	{
-
 		this.unrender();
 
 		switch(Backbone.history.fragment)

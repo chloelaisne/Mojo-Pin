@@ -6,10 +6,10 @@ App.EditMusicView = Backbone.View.extend({
 
 		App.Events.on("onSearchChanged", this.setUri);
 
-		this.music = new App.Music();
-		this.music.bind("change:uri", this.music.getSpotifyModel);
-		this.music.bind("change:uri", function(){ App.Events.trigger("EditMusicComplete"); });
-		this.music.bind("change:image", this.renderDragDropModule);
+		this.model = new App.Music();
+		this.model.bind("change:uri", this.model.getSpotifyModel);
+		this.model.bind("change:uri", function(){ App.Events.trigger("EditMusicComplete"); });
+		this.model.bind("change:image", this.renderDragDropModule);
 
 		this.searchMusicModuleView = new App.SearchMusicModuleView();
 
@@ -19,7 +19,7 @@ App.EditMusicView = Backbone.View.extend({
 
 	setUri: function(uri)
 	{
-		this.music.set
+		this.model.set
 		({
 			uri: uri
 		});
@@ -30,13 +30,13 @@ App.EditMusicView = Backbone.View.extend({
 		if(this.$("#dropzone"))
 			this.$("#dropzone").remove();
 
-		if(this.music.get("uri") != null)
+		if(this.model.get("uri") != null)
 		{
 			this.dropzoneSettings =
 			{
-				trackname 		: this.music.get("name"),
-				trackartists 	: this.music.get("artists"),
-				trackimage 		: this.music.get("image")
+				trackname 		: this.model.get("name"),
+				trackartists 	: this.model.get("artists"),
+				trackimage 		: this.model.get("image")
 			};
 			this.dropzoneTemplate = _.template(Templates.DropzoneActive)(this.dropzoneSettings);
 		}

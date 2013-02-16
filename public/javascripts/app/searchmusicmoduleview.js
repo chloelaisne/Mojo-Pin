@@ -83,7 +83,7 @@ App.SearchMusicModuleView = Backbone.View.extend({
 
 	render: function(){
 
-		this.setElement(Templates.Search);
+		this.setElement(Templates.SearchMusic);
 
 		return this;
 	}

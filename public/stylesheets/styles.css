@@ -483,17 +483,14 @@ nav ul li.active {
 
 
 
-#map {
+#map_location {
 	width: 100%;
 	height: 100%;
 }
 
-#map div:first-child div:first-child div:first-child div:first-child {
-	position: relative!important;
-}
-
-#map div:first-child div:first-child div:first-child div:first-child div:first-child {
-	position: relative!important;
+#map_description {
+	width: 100%;
+	height: 100%;
 }
 
 .window {

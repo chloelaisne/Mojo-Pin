@@ -15,7 +15,11 @@ App.LocationView = Backbone.View.extend({
 	locationClick: function(e)
 	{
 		e.preventDefault();
-		App.Events.trigger("LocationSelected", { reference: this.model.get('reference'), description: this.model.get('description') });
+		App.Events.trigger("LocationSelected",
+		{
+			reference	: this.model.get('reference'),
+			description	: this.model.get('description')
+		});
 	},
 
 	
