@@ -655,11 +655,11 @@ nav ul li.active {
 
 
 
-.search#location {
+.location #search {
 	position: relative;
 }
 
-.search#location #results {
+.location #results {
 	width: 333px;
 	background: #ffffff;
 	position: absolute;
@@ -672,20 +672,20 @@ nav ul li.active {
 	box-shadow: 0 -5px 10px rgba(0,0,0,.5);
 }
 
-.search#location #results ul {
+.location #results ul {
 	width: 100%;
 	overflow: hidden;
 	margin: 8px 0;
 }
 
 
-.search#location #results li {
+.location #results li {
 	height: 28px;
 	line-height: 28px;
 	padding: 0 16px;
 }
 
-.search#location #results li:hover {
+.location #results li:hover {
 	background: -webkit-linear-gradient(top, #afdff8 0%, #97d3f6 100%);
 	box-shadow: 0 1px 0 #bae4fa inset;
 }
@@ -808,16 +808,16 @@ form input:focus {
 	text-align: center;
 }
 
-.search form {
+#search form {
 	margin: 0 auto;
 	padding: 0;
 }
 
-.search#location form {
+.location #search form {
 	width: 435px;
 }
 
-.search#music form {
+.music #search {
 	position: relative;
 	width: 333px;
 	margin: 0 auto;

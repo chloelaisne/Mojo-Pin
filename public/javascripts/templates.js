@@ -17,7 +17,7 @@ Templates.Header = 				'<h1>Mojo Pin</h1>' +
 
 Templates.Offline = 			'Mojo Pin is not available offline';
 
-Templates.EditMusic = 			'<h2>Pin a new track or playlist to your memory map</h2>';
+Templates.EditMusicTitle = 		'<h2>Pin a new track or playlist to your memory map</h2>';
 
 Templates.DropzoneInactive = 	'<div id="dropzone" class="blank">' +
 									'<p><span class="mp-drop"></span>Drag & Drop any playlist</p>' +
@@ -62,7 +62,7 @@ Templates.EditNavigation = 		'<div class="pagination">' +
 								'</div>';
 
 Templates.SearchLocation = 		'<div id="page-bottom">' +
-									'<div class="search" id="location">' +
+									'<div class="search">' +
 										'<form><input type="text" /></form>' +
 										'<div id="results"></div>' +
 									'</div>' +

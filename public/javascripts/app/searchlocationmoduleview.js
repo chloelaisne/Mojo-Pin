@@ -9,10 +9,18 @@ App.SearchLocationModuleView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'searching', 'renderCollection', 'render');
+		_.bindAll(this, 'locationSet', 'searching', 'renderCollection', 'render');
 		this.locationsView = new App.LocationsView();
 		this.locationsCollection = new App.LocationsCollection();
 		this.locationsCollection.on("reset", this.renderCollection, this);
+
+		App.Events.on("LocationSelected", this.locationSet);
+	},
+
+	locationSet: function(location)
+	{
+		this.$("#results").hide();
+		this.$("input").attr("value", location.description);
 	},
 
 	searching: function(e)
@@ -35,13 +43,22 @@ App.SearchLocationModuleView = Backbone.View.extend({
 		this.locationsView.collection = this.locationsCollection;
 
 		this.$("#results").children().remove();
+
 		if(this.locationsCollection.length > 0)
+		{
 			this.$("#results").html((this.locationsView.render()).el);
+			this.$("#results").show();
+		}
+		else
+		{
+			this.$("#results").hide();
+		}
 	},
 
 	render: function()
 	{
 		this.setElement(this.template);
+		this.$("#results").hide();
 		return this;
 	}
 });

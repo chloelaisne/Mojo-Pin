@@ -9,19 +9,25 @@ App.EditView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
+		_.bindAll(this, 'setDependencies', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
 
 		this.editNavigation 		= new App.EditNavigationView();
 		this.views.editMusic 		= new App.EditMusicView();
 		this.views.editLocation 	= new App.EditLocationView();
-		this.views.editDescription 	= new App.EditDescriptionView();
+		this.views.editDescription 	= new App.EditDescriptionView({ model: this.model });
 		this.views.editMusic.model.bind("change"			, this.setMusicModel);
 		this.views.editLocation.model.bind("change:latitude", this.setLocationModel);
 
 		this.model 									= new App.Pin();
-		this.model.bind("change:music_uri"			, this.editNavigation.render);
-		this.model.bind("change:location_reference"	, this.editNavigation.render);
-		this.model.bind("change:description"		, this.editNavigation.render);
+		this.model.bind("change:music_uri"			, this.setDependencies);
+		this.model.bind("change:location_reference"	, this.setDependencies);
+		this.model.bind("change:description"		, this.setDependencies);
+	},
+
+	setDependencies: function()
+	{
+		this.editNavigation.render();
+		this.views.editDescription.model = this.model;
 	},
 
 	setMusicModel: function()
@@ -41,7 +47,6 @@ App.EditView = Backbone.View.extend({
 
 	setDescriptionModel: function()
 	{
-		console.log("EditView.js binds Description model change");
 		this.model.set({ "description"	: this.views.editDescription.model.get("description")});
 	},
 

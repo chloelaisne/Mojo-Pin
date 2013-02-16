@@ -2,7 +2,7 @@ App.EditLocationView = Backbone.View.extend({
 	
 	initialize: function()
 	{
-		_.bindAll(this, 'resizeView', 'setLocation', 'renderSearchModule', 'renderMapModule', 'render');
+		_.bindAll(this, 'setLocation', 'renderSearchModule', 'renderMapModule', 'render');
 		this.searchLocationModuleView = new App.SearchLocationModuleView();
 		this.mapModuleView = new App.MapModuleView({ id: "map_location" });
 
@@ -11,14 +11,6 @@ App.EditLocationView = Backbone.View.extend({
 
 		App.Events.on("LocationSelected", this.setLocation);
 		App.Events.on("LocationDetailsLoaded", this.renderMapModule);
-		
-		$(window).bind("resize", this.resizeView);
-	},
-
-	resizeView: function()
-	{
-		var height = $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight();
-		$("#map_location").height(height);
 	},
 
 	setLocation: function(model)

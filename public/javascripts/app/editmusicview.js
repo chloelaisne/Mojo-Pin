@@ -2,7 +2,7 @@ App.EditMusicView = Backbone.View.extend({
 	
 	initialize: function()
 	{
-		_.bindAll(this, 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule');
+		_.bindAll(this, 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle');
 
 		App.Events.on("onSearchChanged", this.setUri);
 
@@ -25,8 +25,8 @@ App.EditMusicView = Backbone.View.extend({
 		});
 	},
 
-	renderDragDropModule: function(){
-
+	renderDragDropModule: function()
+	{
 		if(this.$("#dropzone"))
 			this.$("#dropzone").remove();
 
@@ -47,7 +47,6 @@ App.EditMusicView = Backbone.View.extend({
 		}
 
 		$(this.el).append(this.dropzoneTemplate);
-		return this;
 	},
 
 	renderPlayerModule: function()
@@ -74,28 +73,30 @@ App.EditMusicView = Backbone.View.extend({
 
 		if(this.playername != null && this.playerartists != null)
 			$(this.el).append(_.template(Templates.Player)(playerTemplateSettings));
-
-		return this;
 	},
 
-	renderSearchModule: function(){
-		this.searchMusicModuleView.render();
+	renderSearchModule: function()
+	{
+		if(this.$("#search"))
+			this.$("#search").remove();
 
-		$(this.el).append(this.searchMusicModuleView.el);
+		$(this.el).append((this.searchMusicModuleView.render()).el);
+	},
 
-		return this;
+	renderTitle: function()
+	{
+		if(this.$("h2"))
+			this.$("h2").remove();
+
+		$(this.el).prepend(Templates.EditMusicTitle);
 	},
 
 	render: function()
 	{
-		$(this.el).append(Templates.EditMusic);
-
+		this.renderTitle();
 		this.renderSearchModule();
-
 		this.renderPlayerModule();
-
 		this.renderDragDropModule();
-
 		return this;
 	}
 
