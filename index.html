@@ -3,13 +3,13 @@
   <head>
     
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
-    <script type="text/javascript" src="public/javascripts/require-2.1.4.js"></script>
     <script type="text/javascript" src="public/javascripts/jquery-1.7.2.js"></script>
     <script type="text/javascript" src="public/javascripts/underscore-1.3.3.js"></script>
     <script type="text/javascript" src="public/javascripts/backbone-0.9.10.js"></script>
     <script type="text/javascript" src="public/javascripts/backbone.marionette.js"></script>
     <script type="text/javascript" src="public/javascripts/apis/spotify.js"></script>
     <script type="text/javascript" src="public/javascripts/templates.js"></script>
+    <script type="text/javascript" src="public/javascripts/utils.js"></script>
     <script type="text/javascript" src="public/javascripts/app.js"></script>
 
     <!-- Models -->
@@ -17,6 +17,7 @@
     <script type="text/javascript" src="public/javascripts/app/music.js"></script>
     <script type="text/javascript" src="public/javascripts/app/location.js"></script>
     <script type="text/javascript" src="public/javascripts/app/pin.js"></script>
+    <script type="text/javascript" src="public/javascripts/app/editnavigation.js"></script>
     <!-- Collections -->
     <script type="text/javascript" src="public/javascripts/app/locationscollection.js"></script>
     <!-- Views -->
@@ -59,9 +60,9 @@
     <script type="text/javascript" src="public/javascripts/app/newsview.js"></script>
 
     <script type="text/javascript">
-      $(document).ready(function(){
-        App.initialize();
-      });
+        $(document).ready(function(){
+            App.initialize();
+        });
     </script>
 
     <!-- CSS Files -->

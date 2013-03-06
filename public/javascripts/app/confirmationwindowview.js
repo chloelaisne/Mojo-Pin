@@ -26,6 +26,7 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 
 		div.appendChild(this.buttonleft);
 
+		console.log('onAdd here');
 		this.div_ = div;
 
 		var panes = this.getPanes();
@@ -75,13 +76,14 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 		this.xMargin = (this.arrowwidth * 2);
 		this.yMargin = 45;
 
+		console.log('draw here');
 		this.div_.style.left = this.position.x + this.xMargin + "px";
 		this.div_.style.top = this.position.y - this.yMargin + "px";
 
 		var map = this.options.map;
 
 		this.loadMouseMove();
-		google.maps.event.addListener(this.map, 'dragend', this.loadMouseMove );
+		this.dragendListener = google.maps.event.addListener(this.map, 'dragend', this.loadMouseMove );
 	},
 
 	loadMouseMove: function()
@@ -99,7 +101,7 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 
 		var map = this.options.map;
 
-		google.maps.event.addListener(this.map, 'mousemove', function(e)
+		this.mousemoveListener = google.maps.event.addListener(this.map, 'mousemove', function(e)
 		{
         	if(e.pixel.x > blPixel.x && e.pixel.x < trPixel.x && e.pixel.y > trPixel.y && e.pixel.y < blPixel.y)
         	{
@@ -111,19 +113,23 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 			}
     	});
 
-    	google.maps.event.addListener(this.map, 'click', function(e)
+    	this.clickListener = google.maps.event.addListener(this.map, 'click', function(e)
 		{
         	if(e.pixel.x > blPixel.x && e.pixel.x < trPixel.x && e.pixel.y > trPixel.y && e.pixel.y < blPixel.y)
         	{
         		App.Events.trigger("RemoveMarker");
+        		App.Events.trigger("delLocation");
         	}
     	});
 	},
 
-	onRemove: function()
+	remove: function()
 	{
+		console.log('onRemove');
+		google.maps.event.removeListener(this.mousemoveListener);
+		google.maps.event.removeListener(this.clickListener);
+		google.maps.event.removeListener(this.dragendListener);
 		this.div_.parentNode.removeChild(this.div_);
-		this.div_ = null;
 	}
 
 });

@@ -1,24 +1,31 @@
 App.Music = Backbone.Model.extend({
 
-	uri: null,
+	defaults:
+	{
+		"uri" 	: null
+	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setObjectModel', 'getSpotifyModel')
+		_.bindAll(this, 'getSpotifyModel')
 	},
 
 	getSpotifyModel: function()
 	{
-		this.spotifyModel = Spotify.Models.Track.fromURI(this.get("uri"), this.setObjectModel);
-	},
+		var self = this;
 
-	setObjectModel: function(data)
-	{
-		this.set
-		({
-			name	: data.name,
-			artists	: data.artists.join(", "),
-			image	: data.image
-		});
+		if(typeof this.get("uri") != 'undefined' || this.get("uri") != null)
+		{
+			this.spotifyModel = Spotify.Models.Track.fromURI(this.get("uri"), function (data)
+			{
+				self.set
+				({
+					name	: data.name,
+					artists	: data.artists.join(", "),
+					image	: data.image
+				});
+			});
+		}
 	}
+
 });

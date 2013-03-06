@@ -9,15 +9,15 @@ App.SearchLocationModuleView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'locationSet', 'searching', 'renderCollection', 'render');
+		_.bindAll(this, 'setLocation', 'searching', 'renderCollection', 'render');
 		this.locationsView = new App.LocationsView();
 		this.locationsCollection = new App.LocationsCollection();
 		this.locationsCollection.on("reset", this.renderCollection, this);
 
-		App.Events.on("LocationSelected", this.locationSet);
+		App.Events.on("setLocation", this.setLocation);
 	},
 
-	locationSet: function(location)
+	setLocation: function(location)
 	{
 		this.$("#results").hide();
 		this.$("input").attr("value", location.description);

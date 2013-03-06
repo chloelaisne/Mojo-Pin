@@ -8,14 +8,6 @@
 
 
 
-#removeMarker {
-	z-index: 1000;
-}
-
-#removeMarker:hover {
-	cursor: pointer;
-}
-
 html, body {
 	height: 100%;
 }
@@ -662,12 +654,12 @@ nav ul li.active {
 .location #results {
 	width: 333px;
 	background: #ffffff;
-	position: absolute;
-	bottom: 38px;
+	margin: 0 0 0 -166px;
 	left: 50%;
-	text-align: left;
-	margin: 0 0 0 -140px;
+	position: absolute;
 	color: #989898;
+	bottom: 70px;
+	text-align: left;
 	outline: 1px solid #656565;
 	box-shadow: 0 -5px 10px rgba(0,0,0,.5);
 }
@@ -782,6 +774,7 @@ form input:focus {
 
 #dropzone .meta {
 	margin-top: 25px;
+	padding-right: 13px;
 }
 
 #dropzone .track-name {
@@ -896,7 +889,6 @@ form input:focus {
 }
 
 #page-bottom form {
-	width: 329px;
 	margin: 0 auto;
 }
 

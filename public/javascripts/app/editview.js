@@ -9,77 +9,236 @@ App.EditView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setDependencies', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
+		_.bindAll(this, 'setClassname', 'setRoute', 'renderRoute', 'getSession', 'setSession', 'delSession', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
 
+		this.view 					= null;
 		this.editNavigation 		= new App.EditNavigationView();
-		this.views.editMusic 		= new App.EditMusicView();
-		this.views.editLocation 	= new App.EditLocationView();
 		this.views.editDescription 	= new App.EditDescriptionView({ model: this.model });
-		this.views.editMusic.model.bind("change"			, this.setMusicModel);
-		this.views.editLocation.model.bind("change:latitude", this.setLocationModel);
 
-		this.model 									= new App.Pin();
-		this.model.bind("change:music_uri"			, this.setDependencies);
-		this.model.bind("change:location_reference"	, this.setDependencies);
-		this.model.bind("change:description"		, this.setDependencies);
+		this.model 							= new App.Pin();
+		this.model.bind("change:classname"	, this.setClassname);
+
+		App.Events.on("setSession"			, this.setSession);
+		App.Events.on("delSession"			, this.delSession);
+
+		App.Events.on("changeMusic"			, this.setMusicModel);
+		App.Events.on("changeLocation"		, this.setLocationModel);
+		App.Events.on("changeDescription"	, this.setDescriptionModel);
+		App.Events.on("changeRoute"			, this.setRoute);
 	},
 
-	setDependencies: function()
+	setRoute: function(route)
 	{
-		this.editNavigation.render();
-		this.views.editDescription.model = this.model;
-	},
+		this.view = route;
 
-	setMusicModel: function()
-	{
-		this.model.set({ "music_uri"	: this.views.editMusic.model.get("uri") });
-	},
+		// Render view
+		this.renderRoute();
 
-	setLocationModel: function()
-	{
-		this.model.set({
-			"location_reference"		: this.views.editLocation.model.get("reference"),
-			"location_latitude"			: this.views.editLocation.model.get("latitude"),
-			"location_longitude"		: this.views.editLocation.model.get("longitude"),
-			"location_description"		: this.views.editLocation.model.get("description")
-		});
-	},
-
-	setDescriptionModel: function()
-	{
-		this.model.set({ "description"	: this.views.editDescription.model.get("description")});
-	},
-
-	renderEditMusic: function(uri)
-	{
-		if(uri != undefined)
-		{
-			this.views.editMusic.music.set({ uri: uri });
-		}
-
-		this.views.editMusic.render();
-		$(this.el).html(this.views.editMusic.el);
-	},
-
-	renderEditLocation: function()
-	{
-		this.views.editLocation.render();
-		$(this.el).html(this.views.editLocation.el);
-		google.maps.event.trigger(this.views.editLocation.mapModuleView.map, "resize");
-	},
-
-	renderEditDescription: function()
-	{
-		this.views.editDescription.render();
-		$(this.el).html(this.views.editDescription.el);
-		google.maps.event.trigger(this.views.editDescription.mapModuleView.map, "resize");
 	},
 
 	render: function()
 	{
-		this.setElement($("#global"));
+		this.getSession();
 		return this;
 	},
+
+ /* ==================================================
+	===== Description model and view
+	================================================== */
+
+	setDescriptionModel: function()
+	{
+		this.model.set
+		({
+			"description"			: this.views.editDescription.model.get("description")
+		});
+		this.editNavigation.setDescriptionNavigationState(true);
+	},
+
+	renderEditDescription: function()
+	{
+		$(this.el).html((this.views.editDescription.render()).el);
+		google.maps.event.trigger(this.views.editDescription.mapModuleView.map, "resize");
+	},
+
+ /* ==================================================
+	===== Location model and view
+	================================================== */
+
+	setLocationModel: function(reference)
+	{
+		if(typeof reference != 'undefined')
+		{
+			this.model.set
+			({
+				"location_reference"	: this.views.editLocation.model.get("reference"),
+				"location_latitude"		: this.views.editLocation.model.get("latitude"),
+				"location_longitude"	: this.views.editLocation.model.get("longitude"),
+				"location_description"	: this.views.editLocation.model.get("description")
+			});
+			this.editNavigation.model.set({ location: true });
+		}
+		else
+		{
+			this.model.unset("location_reference");
+			this.model.unset("location_latitude");
+			this.model.unset("location_longitude");
+			this.model.unset("location_description");
+			this.editNavigation.model.set({ location: false });
+		}
+	},
+
+	renderEditLocation: function()
+	{
+		$(this.el).html((this.views.editLocation.render()).el);
+		google.maps.event.trigger(this.views.editLocation.mapModuleView.map, "resize");
+	},
+
+ /* ==================================================
+	===== Music model and view
+	================================================== */
+
+	setMusicModel: function(uri)
+	{
+		if(typeof uri != 'undefined')
+		{
+			this.model.set({ "music_uri": uri });
+			this.editNavigation.model.set({ music: true });
+		}
+		else
+		{
+			this.model.unset("music_uri");
+			this.editNavigation.model.set({ music: false });
+		}
+	},
+
+	renderEditMusic: function()
+	{
+		$(this.el).html((this.views.editMusic.render()).el);
+	},
+
+ /* ==================================================
+	===== Get session data and initialize views
+	================================================== */
+
+	getSession: function()
+	{
+		var self = this;
+
+		$.ajax({
+			url 	: 'http://localhost:3000/json/session/pin',
+			type 	: 'GET'
+		})
+		.done(function (cookie, textStatus, jqXHR){
+			// Initialize Music view with Model data or Session data
+			if(typeof cookie.music != 'undefined'  && cookie.music != null)
+				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
+			else if(typeof self.views.editMusic == 'undefined')
+				self.views.editMusic = new App.EditMusicView();
+
+			// Initialize Location view with Session data
+			if(typeof cookie.location != 'undefined'  && cookie.location != null)
+				self.views.editLocation = new App.EditLocationView({ model: new App.Location({ reference: cookie.location }) });
+			else if(typeof self.views.editLocation == 'undefined')
+				self.views.editLocation = new App.EditLocationView();
+
+			// Initialize Route model with Session data
+			if(typeof cookie.route != 'undefined')
+				self.model.set({ "route": cookie.route });
+
+			// Render view
+			self.renderRoute();
+
+		})
+		.fail(function (jqXHR, textStatus, errorThrown){
+			console.log("fail");
+		});
+	},
+
+	setClassname: function()
+	{
+		$('body').removeClass().addClass(this.model.get("classname"));
+	},
+
+	renderRoute: function()
+	{
+		switch(this.view)
+		{
+			case "description":
+				this.model.set({ "classname": "description"});
+				this.renderEditDescription();
+				this.editNavigation.editDescriptionViewNavigation();
+				break;
+			case "location":
+				this.model.set({ "classname": "location"});
+				this.renderEditLocation();
+				this.editNavigation.editLocationViewNavigation();
+				break;
+			default:
+				this.model.set({ "classname": "music"});
+				this.renderEditMusic();
+				this.editNavigation.editMusicViewNavigation();
+				break;
+		}
+		console.log('2');
+		this.editNavigation.render();
+	},
+
+ /* ==================================================
+	===== Update session data
+	================================================== */
+
+	setSession: function(name)
+	{
+		if(name == 'music')
+			object = { music 	: this.views.editMusic.model.get("uri") };
+		else if(name == 'location')
+			object = { location : this.views.editLocation.model.get("reference") };
+		else if(name == 'route')
+			object = { route: this.model.get("route") };
+
+		$.ajax({
+			url 	: 'http://localhost:3000/json/session/pin',
+			type 	: 'POST',
+			data 	: object
+		})
+		.done(function (data, textStatus, jqXHR){ console.log("setSession done"); })
+		.fail(function (jqXHR, textStatus, errorThrown){ console.log("setSession fail"); });
+	},
+
+ /* ==================================================
+	===== Delete session data
+	================================================== */
+
+	delSession: function(name)
+	{
+		var self = this;
+
+		if(name == 'music')
+		{
+			this.views.editMusic.model.clear();
+			object = { music: null };
+		}
+		else if(typeof name == 'undefined')
+		{
+			this.model.clear();
+			object = {};
+		}
+
+		$.ajax({
+			type 	: 'DELETE',
+			url		: 'http://localhost:3000/json/session/pin',
+			data	: object
+		})
+		.done(function (data, textStatus, jqXHR){
+			self.editNavigation.model.set({ "music": false });
+		})
+		.fail(function (jqXHR, textStatus, errorThrown){ console.log("delSession fail"); });
+	},
+
+ /* ==================================================
+	===== Save data to the database
+	================================================== */
 
 	savePin: function()
 	{
@@ -97,12 +256,8 @@ App.EditView = Backbone.View.extend({
 					description				: this.model.get("description")
 				}
 			})
-			.done(function(data, textStatus, jqXHR){
-				console.log("done");
-			})
-			.fail(function(jqXHR, textStatus, errorThrown){
-				console.log("fail");
-			});
+			.done(function (data, textStatus, jqXHR){ console.log("Succeeded to save pin in database"); })
+			.fail(function (jqXHR, textStatus, errorThrown){ console.log("Failed to save pin in database"); });
 		}
 	}
 

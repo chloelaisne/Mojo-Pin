@@ -1,15 +1,33 @@
 App.EditMusicView = Backbone.View.extend({
 	
+	attributes:
+	{
+		id: "music"
+	},
+
+	events:
+	{
+		"click #dropzone": "removeMusic"
+	},
+
 	initialize: function()
 	{
-		_.bindAll(this, 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle');
+		_.bindAll(this, 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
 
 		App.Events.on("onSearchChanged", this.setUri);
 
-		this.model = new App.Music();
-		this.model.bind("change:uri", this.model.getSpotifyModel);
-		this.model.bind("change:uri", function(){ App.Events.trigger("EditMusicComplete"); });
-		this.model.bind("change:image", this.renderDragDropModule);
+		if(typeof this.model == "undefined" || this.model.get("uri") == null)
+		{
+			this.model = new App.Music();
+		}
+		else
+		{
+			App.Events.trigger("changeMusic", this.model.get("uri"));
+			this.model.getSpotifyModel();
+		}
+
+		this.model.bind("change:uri"	, this.uriChanged);
+		this.model.bind("change:image"	, this.renderDragDropModule);
 
 		this.searchMusicModuleView = new App.SearchMusicModuleView();
 
@@ -17,12 +35,23 @@ App.EditMusicView = Backbone.View.extend({
 		
 	},
 
+	uriChanged: function()
+	{
+		App.Events.trigger("changeMusic", this.model.get("uri"));
+		App.Events.trigger("UpdateNavigation", this.model.get("uri"));
+		if(typeof this.model.get("uri") != undefined)
+			this.model.getSpotifyModel();
+	},
+
+	removeMusic: function()
+	{
+		if(typeof this.model.get("uri") != 'undefined')
+			App.Events.trigger('delSession', 'music');
+	},
+
 	setUri: function(uri)
 	{
-		this.model.set
-		({
-			uri: uri
-		});
+		this.model.set ({ uri: uri });
 	},
 
 	renderDragDropModule: function()
@@ -39,6 +68,8 @@ App.EditMusicView = Backbone.View.extend({
 				trackimage 		: this.model.get("image")
 			};
 			this.dropzoneTemplate = _.template(Templates.DropzoneActive)(this.dropzoneSettings);
+
+			App.Events.trigger("EditMusicComplete");
 		}
 		else
 		{
@@ -47,6 +78,7 @@ App.EditMusicView = Backbone.View.extend({
 		}
 
 		$(this.el).append(this.dropzoneTemplate);
+		$(".track-name").text(Utils.ShortenString($(".track-name")));
 	},
 
 	renderPlayerModule: function()
@@ -93,6 +125,11 @@ App.EditMusicView = Backbone.View.extend({
 
 	render: function()
 	{
+		//App.Events.trigger("changeRoute", "music");
+
+		// Delegate events when view is re-rendered
+		this.delegateEvents();
+
 		this.renderTitle();
 		this.renderSearchModule();
 		this.renderPlayerModule();

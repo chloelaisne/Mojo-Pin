@@ -29,7 +29,6 @@ App.Router = Backbone.Router.extend({
 		this.views.friends = new App.FriendsView();
 
 		this.views.edit				= new App.EditView();
-		this.bind("route:edit", this.views.edit.editNavigation.render);
 
 		this.showOnline();
 	},
@@ -67,42 +66,21 @@ App.Router = Backbone.Router.extend({
 
 	edit: function(action)
 	{
-		this.views.edit.render();
-		//$('#global').html(this.views.edit.el);
-
-		switch(action)
-		{
-			case 'description':
-				this.views.edit.renderEditDescription();
-				this.views.app.model.set({ classname: 'description' });
-			break;
-			case 'location':
-				this.views.edit.renderEditLocation();
-				this.views.app.model.set({ classname: 'location' });
-			break;
-			default:
-				this.views.edit.renderEditMusic();
-				this.views.app.model.set({ classname: 'music' });
-			break;
-		}
-
+		$('#global').html((this.views.edit.render()).el);
 	},
 
 	news: function()
 	{
-		//this.views.editNavigation.unrender();
 		$('#global').html((this.views.news.render()).el);
 	},
 
 	users: function()
 	{
-		//this.views.editNavigation.unrender();
 		$('#global').html((this.views.friends.render()).el);
 	},
 
 	user: function()
 	{
-		//this.views.editNavigation.unrender();
 		$('#global').html((this.views.user.render()).el);
 	}
 

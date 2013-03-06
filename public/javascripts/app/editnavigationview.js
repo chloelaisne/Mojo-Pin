@@ -9,55 +9,54 @@ App.EditNavigationView = Backbone.View.extend({
 		"click #cancel"		: "clickCancel"
 	},
 
-	elements: {
-		music 			: false,
-		location 		: false,
-		description 	: true
-	},
-
 	initialize: function()
 	{
-		_.bindAll(this, 'render', 'clickPrevious', 'clickNext', 'clickCancel', 'elementStateChange', 'editMusicViewNavigation', 'editLocationViewNavigation', 'editDescriptionViewNavigation');
+		_.bindAll(this,'setMusicNavigationState', 'setLocationNavigationState', 'setDescriptionNavigationState', 'render', 'clickPrevious', 'clickNext', 'clickCancel', 'editMusicViewNavigation', 'editLocationViewNavigation', 'editDescriptionViewNavigation');
 
-		App.Events.on("all", this.elementStateChange);
+		this.model 							= new App.EditNavigation();
+		this.model.bind("change:music"		, this.setMusicNavigationState);
+		this.model.bind("change:location"	, this.setLocationNavigationState);
+		this.model.bind("change:description", this.setDescriptionNavigationState);
+
+		this.editMusicViewNavigation();
 	},
 
-	elementStateChange: function(e)
+	setMusicNavigationState: function()
 	{
-		switch(e)
-		{
-			case "EditMusicComplete":
-				this.elements.music = true;
-				break;
-			case "EditLocationComplete":
-				this.elements.location = true;
-				break;
-			case "EditDescriptionComplete":
-				this.elements.description = true;
-				break;
-		}
+		this.editMusicViewNavigation();
+		this.render();
+	},
 
+	setLocationNavigationState: function()
+	{
+		this.editLocationViewNavigation();
+		this.render();
+	},
+
+	setDescriptionNavigationState: function()
+	{
+		this.editDescriptionViewNavigation();
 		this.render();
 	},
 
 	editMusicViewNavigation: function()
 	{
 		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: 1, route: "/user/chloelaisne" };
-		this.next = { label: "Next", theme: "crossbreed", icon: 1, state: this.elements.music, route: "edit/location" };
+		this.next = { id: 'music', goto: 'location', label: "Next", theme: "crossbreed", icon: 1, state: this.model.get("music"), route: "edit/location" };
 		this.cancel = { route: null };
 	},
 
 	editLocationViewNavigation: function()
 	{
 		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/music" };
-		this.next = { label: "Next", theme: "light", icon: 1, state: this.elements.location, route: "edit/description" };
+		this.next = { id: 'location', goto: 'description', label: "Next", theme: "light", icon: 1, state: this.model.get("location"), route: "edit/description" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
 
 	editDescriptionViewNavigation: function()
 	{
 		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/location" };
-		this.next = { label: "Done", theme: "primary", icon: 0, state: this.elements.description, route: "/user/chloelaisne" };
+		this.next = { id: 'description', goto: null, label: "Done", theme: "primary", icon: 0, state: this.model.get("description"), route: "/user/chloelaisne" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
 
@@ -72,11 +71,14 @@ App.EditNavigationView = Backbone.View.extend({
 
 	clickNext: function(e)
 	{
+		console.log("clickNext", this.next.id, this.next.goto);
 		e.preventDefault();
 		if(this.next.route != null && this.next.state == true)
 		{
-			App.router.navigate(this.next.route, true);
+			App.Events.trigger('setSession', this.next.id);
+			App.Events.trigger('changeRoute', this.next.goto);
 		}
+
 	},
 
 	clickCancel: function(e)
@@ -84,6 +86,7 @@ App.EditNavigationView = Backbone.View.extend({
 		e.preventDefault();
 		if(this.cancel.route != null)
 		{
+			App.Events.trigger('delSession');
 			App.router.navigate(this.cancel.route, true);
 			this.unrender();
 		}
@@ -91,22 +94,10 @@ App.EditNavigationView = Backbone.View.extend({
 
 	render: function()
 	{
+		// Unrender navigation
 		this.unrender();
 
-		switch(Backbone.history.fragment)
-		{
-			case "edit/location":
-				this.editLocationViewNavigation();
-				break;
-
-			case "edit/description":
-				this.editDescriptionViewNavigation();
-				break;
-
-			default:
-				this.editMusicViewNavigation();
-				break;
-		}
+		//console.log('setButtonState', this.next.state);
 
 		this.templateSettings =
 		{

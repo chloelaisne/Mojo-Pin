@@ -31,17 +31,16 @@ App.MapModuleView = Backbone.View.extend({
 
 	removeMarker: function()
 	{
-		if(this.marker != undefined)
+		if(typeof this.marker != 'undefined' && this.marker.getMap() != null)
 		{
 			this.marker.setMap(null);
-			this.marker = null;
-			this.confirmationWindowView.onRemove();
-			this.confirmationWindowView = null;
+			this.confirmationWindowView.remove();
 		}
 	},
 
 	addNoticeMarker: function(model)
 	{
+		console.log("addNoticeMarker");
 		this.removeMarker();
 		this.position = new google.maps.LatLng(model.location_latitude, model.location_longitude);
 		this.markerOptions = {
@@ -55,6 +54,7 @@ App.MapModuleView = Backbone.View.extend({
 
 	addMarker: function(model)
 	{
+		console.log("addConfirmationMarker");
 		this.removeMarker();
 		this.position = new google.maps.LatLng(model.latitude, model.longitude);
 		this.markerOptions = {

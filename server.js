@@ -17,12 +17,11 @@ app.listen(3000);
  */
 
 var secret = '18N320e5V8';
-var store = new express.session.MemoryStore;
 
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser());
-app.use(express.session({secret: secret, store: store}));
+app.use(express.session({ secret: secret, cookie: { maxAge: 1000 * 60 * 60 * 24 } })); // Expires +24 hours
 app.use('/images', express.static(__dirname + '/public/images'));
 app.use('/javascripts', express.static(__dirname + '/public/javascripts'));
 app.use('/stylesheets', express.static(__dirname + '/public/stylesheets'));
@@ -48,7 +47,7 @@ var connection = mysql.createConnection(options);
  */
 
 app.get('*', function (request, response, next){
-  console.log('index.html');
+  console.log(JSON.stringify(request.session));
   if(typeof request.session.id == 'undefined') request.session.id = 1;
   if(request.url.indexOf('/json') == 0) return next();
   fs.readFile(__dirname + '/index.html', 'utf8', function (error, data){
@@ -56,6 +55,49 @@ app.get('*', function (request, response, next){
     response.writeHead(200, {'Content-Type': 'text/html'});
     response.end(data, 'utf-8');
   });
+});
+
+/* ==================================================
+   ==================== SESSION
+   ================================================== */
+
+app.get('/json/session/pin', function (request, response) {
+  if(typeof request.session != 'undefined') {
+    response.writeHead(200, { 'Content-type': 'application/json' });
+    response.write(JSON.stringify(request.session), 'utf-8');
+    response.end('\n');
+  }
+});
+
+app.post('/json/session/pin', function (request, response) {
+  if(request.body.music != 'undefined' && request.body.music != null)
+    request.session.music = request.body.music;
+  else if(request.body.location != 'undefined' && request.body.location != null)
+    request.session.location = request.body.location;
+  else if(request.body.description != 'undefined' && request.body.description != null)
+    request.session.description = request.body.description;
+
+  response.writeHead(200, { 'Content-type': 'application/json' });
+  response.end();
+});
+
+app.del('/json/session/pin', function (request, response) {
+  if(typeof request.body.music != 'undefined')
+  {
+    request.session.music = null;
+  }
+  else
+  {
+    if(request.session.music != 'undefined' && request.session.music != null)
+      request.session.music = null;
+    if(request.session.location != 'undefined' && request.session.location != null)
+      request.session.location = null;
+    if(request.session.description != 'undefined' && request.session.description != null)
+      request.session.description = null;
+  }
+  
+  response.writeHead(200, { 'Content-type': 'application/json' });
+  response.end();
 });
 
 // ===== USERS ===== //
@@ -131,7 +173,7 @@ app.put('/json/facebookauth', function (request, response){
 
 // Retrieve all pins
 app.get('/json/pins', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_tracks`) ON (`mp_users`.id = `mp_pins`.user_id AND `mp_locations`.id = `mp_pins`.location_id AND `mp_tracks`.id = `mp_pins`.uri_id)";
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.id = `mp_pins`.user_id AND `mp_locations`.id = `mp_pins`.location_id AND `mp_musics`.id = `mp_pins`.music_id)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
