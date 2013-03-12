@@ -2,11 +2,6 @@
 
 ## Facebook authentification
 
-### Client credentials:
-- APP_ID = 476683619043995
-- APP_SECRET = 005288b1a846a66b3393554404c73472
-- ACCESS_TOKEN = 476683619043995|IYHycM4RaQcOok4KpyCnXIFuTSI
-
 > #### 1. Obtain an App Access Token:
 > *https://graph.facebook.com/oauth/access_token?client_id=YOUR_APP_ID&client_secret=YOUR_APP_SECRET&grant_type=client_credentials*
 >
@@ -18,36 +13,10 @@
 > #### 3. Extending client-side user access tokens:
 > *https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=APP_ID&client_secret=APP_SECRET&fb_exchange_token=SHORT_LIVED_ACCESS_TOKEN*
 
-### Flow chart:
-1. **DONE** / Get Facebook ID session.
-2. **DONE** / If Facebook ID session does not exist go to below
-3. Open Facebook Auth dialog for user to type his credentials go to below
-4. If Facebook ID exist in database, fetch data
-5. If Facebook ID does not exist, create new row
-6. If Facebook ID session does exist go to below
-7. **DONE** / Get Spotify App User ID
-8. **DONE** / Check Spotify App User ID in the databas
-9. If Spotify App User ID does not exist go to 11
-10. **DONE** / If Spotify App User ID does exist go to 20
-11. **DONE** / Call Spotify auth method authentificateWithFacebook
-12. **DONE** / If authenticateWithFacebook fail go to 14
-13. **DONE** / If authentificateWithFacebook succeed go to 16
-14. **DONE** / Page "Log onto Facebook to start" + Facebook Login Button
-15. **DONE** / Click Facebook Login Button that goes to 10
-16. **DONE** / Get Access Token
-17. **DONE** / Exchange short-lived Acess Token for longer-lived Access Token by /oauth endpoint
-18. **DONE** / Debug Access Token and get User ID and Expiration Date
-19. **DONE** / Create row in the database with the information from 16
-20. **DONE** / Get Access Token, User ID, and Expiration Date from the database
-21. **DONE** / Debug Access Token
-22. **DONE** / If debug Access Token succeed return
-23. **DONE** / If debug Access Token does not succeed go to 11
-24. Change body CSS class
-25. **DONE** / Set header inside its own view for rendering and unrendering
-26. **DONE** / Redirect from login page to main page when user logs in
+## To-Do
 
-### 12/03/2013 to-do list:
-- Enable connection to another facebook account
-- Basic facebook information on profile
+### 12/03/2013:
+- **DONE** / Facebook authentification
+- Display Facebook information on user profile
 - Friend list
 - Friend profile

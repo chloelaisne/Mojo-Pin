@@ -12,7 +12,6 @@ App.LoginView = Backbone.View.extend({
 	authDialog: function(e)
 	{
 		e.preventDefault();
-		console.log("click");
 		App.Events.trigger('FacebookAuthDialog');
 	},
 

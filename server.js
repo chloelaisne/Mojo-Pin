@@ -7,7 +7,6 @@ var express   = require('express')
   , mysql     = require('mysql')
   , fs        = require('fs')
   , events    = require('events')
-  , graph     = require('fbgraph')
   , FB        = require('fb');
 
 var app = express();
@@ -57,9 +56,10 @@ var connection = mysql.createConnection(options);
  */
 
 app.get('*', function (request, response, next){
-  console.log(JSON.stringify(request.session));
-  if(typeof request.session.id == 'undefined') request.session.id = 1;
+  
+  // If RESTful API related HTTP Request
   if(request.url.indexOf('/json') == 0) return next();
+
   fs.readFile(__dirname + '/index.html', 'utf8', function (error, data){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'text/html'});
@@ -70,11 +70,6 @@ app.get('*', function (request, response, next){
 /* ==================================================
    ==================== SESSION
    ================================================== */
-
-// Update Access Token
-app.put('/json/session/token', function (request, response) {
-  
-});
 
 
 // Logout user from Facebook account
@@ -167,11 +162,11 @@ app.post('/json/login', function (request, response) {
 
 });
 
-app.post('/json/session/login', function (request, response) {
+app.post('/json/session/user', function (request, response) {
 
   // ===== If user session does not exist ===== //
   if(request.session.facebookid == null) {
-    console.log("If user session does not exist");
+
     /***** CLIENT SIDE - Open Facebook Authentification Dialog *****/
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify({ action: 'authenticateWithFacebook' }), 'utf-8');
@@ -179,7 +174,6 @@ app.post('/json/session/login', function (request, response) {
   }
   // ===== If user session exists ===== //
   else {
-    console.log("If user session exists");
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.end('\n');
   }

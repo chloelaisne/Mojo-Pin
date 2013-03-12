@@ -35,7 +35,7 @@ App.AppView = Backbone.View.extend({
 		// Verify if user session exists
 		$.ajax({
 			type: 'POST',
-			url: 'http://localhost:3000/json/session/login'
+			url: 'http://localhost:3000/json/session/user'
 		})
 		.done(function (data, textStatus, jqXHR){
 			// If user session does not exist, redirect to Facebook Auth Dialog
