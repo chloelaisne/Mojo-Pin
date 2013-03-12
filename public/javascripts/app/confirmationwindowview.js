@@ -26,11 +26,13 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 
 		div.appendChild(this.buttonleft);
 
-		console.log('onAdd here');
 		this.div_ = div;
 
 		var panes = this.getPanes();
 		panes.overlayLayer.appendChild(div);
+
+		console.log("outerWidth", $(div).outerWidth());
+		console.log("outerHeight", $(div).outerHeight());
 
 		this.width = $(div).outerWidth();
 		this.height = $(div).outerHeight();
@@ -76,7 +78,6 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 		this.xMargin = (this.arrowwidth * 2);
 		this.yMargin = 45;
 
-		console.log('draw here');
 		this.div_.style.left = this.position.x + this.xMargin + "px";
 		this.div_.style.top = this.position.y - this.yMargin + "px";
 
@@ -125,7 +126,6 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 
 	remove: function()
 	{
-		console.log('onRemove');
 		google.maps.event.removeListener(this.mousemoveListener);
 		google.maps.event.removeListener(this.clickListener);
 		google.maps.event.removeListener(this.dragendListener);

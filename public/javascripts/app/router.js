@@ -4,83 +4,108 @@ App.Router = Backbone.Router.extend({
 
 	routes:
 	{
-		'news': 'news',
+		//'news': 'news',
 
 		""					: "edit",
-		"offline"			: "showOffline",
+		"offline"			: "offline",
 
 		"users"				: "users",
 		"user/*user"		: "user",
 
-		"edit/*action"		: "edit"
+		"edit/*action"		: "edit",
+		"login"				: "login"
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'showOnline', 'showOffline', 'setBody', 'news', 'users', 'user', 'edit');
+		_.bindAll(this, 'login', 'offline', 'setState', 'users', 'user', 'edit');
 
-		App.Events.on("StateChanged", this.setBody);
+		App.Events.on("StateChanged", this.setState);
 
-		this.views.app 				= new App.AppView({ el: $("body") });
-		this.views.offline 			= new App.OfflineView({ el: $("body") });
+		this.views.app 		= new App.AppView({ el: $("body") });
 
-		this.views.news = new App.NewsView();
+		this.views.offline 	= new App.OfflineView();
+		this.views.login 	= new App.LoginView();
+		this.views.edit		= new App.EditView();
+
+		
+
+		//this.views.news = new App.NewsView();
 		this.views.user = new App.UserView();
 		this.views.friends = new App.FriendsView();
+		
 
-		this.views.edit				= new App.EditView();
-
-		this.showOnline();
-	},
-
-	setBody: function(state)
-	{
-		if(state == App.OFFLINE)
-		{
-			this.views.app.model.set({ classname: 'offline' });
-        	this.view = this.views.offline;
-        	this.view.render();
-        	this.history = { back: Backbone.history.fragment };
-        	this.navigate('showOffline', true);
-
-		}
-		else if(state == App.ONLINE)
-		{
-			this.views.app.model.set({ classname: '' });
-			this.view = this.views.app;
-        	this.view.render();
-        	this.navigate(this.history.back, true);
-		}
-	},
-
-	showOnline: function()
-	{
 		this.view = this.views.app;
         this.view.render();
 	},
 
-	showOffline: function()
+	setState: function(state)
 	{
-		
+		if(state == App.OFFLINE)
+		{
+			this.views.app.model.set({
+				header		: false,
+				classname	: 'news'
+			});
+        	this.navigate('offline', true);
+		}
+		else
+		{
+			// ONLINE
+		}
+	},
+
+	offline: function()
+	{
+		this.views.app.model.set({
+			header		: false,
+			classname	: ['light', 'offline']
+		});
+		$('#global').html((this.views.offline.render()).el);
 	},
 
 	edit: function(action)
 	{
+		this.views.app.model.set({
+			header		: true,
+			classname	: 'edit'
+		});
 		$('#global').html((this.views.edit.render()).el);
 	},
 
-	news: function()
+	/*news: function()
 	{
+		this.views.app.model.set({
+			header		: true,
+			classname	: 'news'
+		});
 		$('#global').html((this.views.news.render()).el);
+	},*/
+
+	login: function()
+	{
+		this.views.app.model.set({
+			header		: false,
+			classname	: ['light', 'login']
+		});
+		$('#global').html((this.views.login.render()).el);
 	},
 
 	users: function()
 	{
+		this.views.app.model.set({
+			header		: true,
+			classname	: 'user'
+		});
 		$('#global').html((this.views.friends.render()).el);
 	},
 
 	user: function()
 	{
+		this.views.app.model.set({
+			header		: true,
+			classname	: 'user'
+		});
 		$('#global').html((this.views.user.render()).el);
 	}
 

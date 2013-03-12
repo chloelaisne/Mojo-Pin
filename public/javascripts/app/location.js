@@ -21,6 +21,7 @@ App.Location = Backbone.Model.extend({
 				});
 
 				App.Events.trigger("LocationDetailsLoaded", self.toJSON());
+				App.Events.trigger("changeLocation", self.get("reference"));
 			}
 		});
 	}

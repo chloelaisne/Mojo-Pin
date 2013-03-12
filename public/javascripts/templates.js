@@ -1,9 +1,9 @@
 Templates = 					{};
 
-Templates.App = 				'<div id="header"></div>' +
-								'<div id="global"></div>';
+Templates.App = 				'<div id="global"></div>';
 
-Templates.Header = 				'<h1>Mojo Pin</h1>' +
+Templates.Header = 				'<div id="header">' + 
+								'<h1>Mojo Pin</h1>' +
 								'<nav>' +
 									'<ul class="left">' +
 										'<li id="goto-news">News</li>' +
@@ -12,8 +12,10 @@ Templates.Header = 				'<h1>Mojo Pin</h1>' +
 									'<ul class="right">' +
 										'<li id="goto-friends">Friends</li>' +
 										'<li id="goto-pin" class="mp-icon"><span class="mp-plus"></span>Pin</li>' +
+										'<li id="goto-logout">Logout</li>' +
 									'</ul>' +
-								'</nav>';
+								'</nav>' +
+								'</div>';
 
 Templates.Offline = 			'Mojo Pin is not available offline';
 
@@ -43,7 +45,7 @@ Templates.EditDescription = 	'<div id="page-bottom">' +
 									'</div>' +
 								'</div>';
 
-Templates.Player = 				'<div class="player">Use currently playing:<span><span class="volume on"></span><%= trackname %> by <%= trackartists %></span></div>'
+Templates.Player = 				'<div class="player">Use currently playing:<span class="track"><span class="volume on"></span><%= trackname %> by <%= trackartists %></span></div>'
 
 Templates.EditNavigation = 		'<div class="pagination">' +
 									'<div class="left">' +
@@ -74,9 +76,23 @@ Templates.SearchMusic = 		'<div id="search" id="music">' +
 									'</form>' +
 								'</div>';
 
+Templates.Profile = 			'<div id="top">' +
+									'<div class="picture"></div>' +
+									'<div class="information">' +
+										'<div class="name">Chloé Laisné</div>' +
+										'<div class="statistics">' +
+											'<p id="location"><span class="mp-marker"></span>Berlin, Germany</p>' +
+											'<p id="memories"><span class="mp-disc"></span>9 memories</p>' +
+										'</div>' +
+									'</div>' +
+								'</div>' +
+								'<div id="sidebar"></div>' +
+								'<div id="map_profile"></div>';
+
+Templates.Login = 				'<h2>Please Log In with Facebook to Continue</h2>' +
+								'<span class="mp-login">Log In</span>';
 
 Templates.Activity = '<div class="music"><span class="<%= type %>"></span><b><%= title %></b> by <%= artists %></div><div class="location"><%= location %></div>';
-Templates.User = '<div id="top"><div class="picture"></div><div class="information"><div class="name">Chloé Laisné</div><div class="statistics"><span class="mp-disc"></span>9 memories</div></div></div><div id="sidebar"></div><div id="map"></div>';
 Templates.Friend = '<li style="display:<%= display %>"><div class="picture"><img src="<%= picture %>" alt="<%= name %>\'s profile picture"/><button class="sp-button">Send Invitation</button></div><a><span><%= name %></span></a></li>';
 Templates.Friends = '<div><form id="filter"><input type="text" value="Filter"/></form><ul class="friendslist"></ul></div>';
 Templates.TrackResults = '<div class="title" id="tracks">Tracks</div><ul></ul>';

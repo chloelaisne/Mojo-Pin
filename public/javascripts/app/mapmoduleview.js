@@ -2,7 +2,7 @@ App.MapModuleView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'addNoticeMarker', 'resizeView', 'addMarker', 'removeMarker', 'render');
+		_.bindAll(this, 'addNoticeMarker', 'resizeView', 'addConfirmationMarker', 'removeMarker', 'render');
 
 		App.Events.on("RemoveMarker", this.removeMarker);
 
@@ -29,39 +29,40 @@ App.MapModuleView = Backbone.View.extend({
 		$(this.el).height(height);
 	},
 
-	removeMarker: function()
+	removeMarker: function(marker)
 	{
-		if(typeof this.marker != 'undefined' && this.marker.getMap() != null)
+		if(typeof marker != 'undefined' && marker.getMap() != null)
 		{
-			this.marker.setMap(null);
-			this.confirmationWindowView.remove();
+			marker.setMap(null);
+			if(typeof this.confirmationWindowView != 'undefined')
+				this.confirmationWindowView.remove();
+			if(typeof this.noticeWindowView != 'undefined')
+				this.noticeWindowView.remove();
 		}
 	},
 
 	addNoticeMarker: function(model)
 	{
-		console.log("addNoticeMarker");
-		this.removeMarker();
+		this.removeMarker(this.noticeMarker);
 		this.position = new google.maps.LatLng(model.location_latitude, model.location_longitude);
-		this.markerOptions = {
+		this.noticeMarkerOptions = {
 			position: this.position,
-			map: model.map
+			map: model.map.map
 		};
-		this.marker = new google.maps.Marker(this.markerOptions);
+		this.noticeMarker = new google.maps.Marker(this.noticeMarkerOptions);
 		this.map.setCenter(this.position);
 		this.noticeWindowView = new App.NoticeWindowView({ map: model.map, latlng: this.position, description: model.location_description });
 	},
 
-	addMarker: function(model)
+	addConfirmationMarker: function(model)
 	{
-		console.log("addConfirmationMarker");
-		this.removeMarker();
+		this.removeMarker(this.confirmationMarker);
 		this.position = new google.maps.LatLng(model.latitude, model.longitude);
-		this.markerOptions = {
+		this.confirmationMarkerOptions = {
 			position: this.position,
 			map: model.map.map
 		};
-		this.marker = new google.maps.Marker(this.markerOptions);
+		this.confirmationMarker = new google.maps.Marker(this.confirmationMarkerOptions);
 		this.map.setCenter(this.position);
 		this.confirmationWindowView = new App.ConfirmationWindowView({ map: model.map, latlng: this.position });
 	},

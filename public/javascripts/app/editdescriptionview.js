@@ -4,6 +4,7 @@ App.EditDescriptionView = Backbone.View.extend({
 	{
 		_.bindAll(this, 'renderDescriptionModule', 'renderMapModule', 'render')
 		this.mapModuleView = new App.MapModuleView({ id: "map_description" });
+		this.model = new App.Description();
 	},
 
 	renderDescriptionModule: function()
@@ -11,10 +12,13 @@ App.EditDescriptionView = Backbone.View.extend({
 		$(this.el).append(Templates.EditDescription);
 	},
 
-	renderMapModule: function()
+	renderMapModule: function(model)
 	{
 		this.model.set({ "map": this.mapModuleView.map});
-		this.mapModuleView.addNoticeMarker(this.model);
+		if(model != undefined)
+		{
+			this.mapModuleView.addNoticeMarker(model);
+		}
 		$(this.el).prepend((this.mapModuleView.render()).el);
 	},
 

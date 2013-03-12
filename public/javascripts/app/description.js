@@ -1,0 +1,1 @@
+App.Description = Backbone.Model.extend();

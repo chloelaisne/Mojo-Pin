@@ -3,14 +3,24 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , mysql = require ('mysql')
-  , fs = require('fs')
-  , events = require('events')
-  , mongoose = require('mongoose');
+var express   = require('express')
+  , mysql     = require('mysql')
+  , fs        = require('fs')
+  , events    = require('events')
+  , graph     = require('fbgraph')
+  , FB        = require('fb');
 
 var app = express();
 app.listen(3000);
+
+/*
+ * Facebook credentials.
+ */
+
+var APP_ID      = 476683619043995;
+var APP_SECRET  = '005288b1a846a66b3393554404c73472';
+var APP_TOKEN   = '476683619043995|IYHycM4RaQcOok4KpyCnXIFuTSI';
+FB.setAccessToken(APP_TOKEN);
 
 /*
  * Configuration.
@@ -21,7 +31,7 @@ var secret = '18N320e5V8';
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser());
-app.use(express.session({ secret: secret, cookie: { maxAge: 1000 * 60 * 60 * 24 } })); // Expires +24 hours
+app.use(express.session({ secret: secret, cookie: { maxAge: 1000 * 60 * 60 } })); // Expires +1 hours
 app.use('/images', express.static(__dirname + '/public/images'));
 app.use('/javascripts', express.static(__dirname + '/public/javascripts'));
 app.use('/stylesheets', express.static(__dirname + '/public/stylesheets'));
@@ -61,6 +71,125 @@ app.get('*', function (request, response, next){
    ==================== SESSION
    ================================================== */
 
+// Update Access Token
+app.put('/json/session/token', function (request, response) {
+  
+});
+
+
+// Logout user from Facebook account
+app.post('/json/logout', function (request, response) {
+
+  // Delete user permissions
+  var http = request.session.facebookid + '/permissions';
+  FB.api(http, 'delete', function (data) {
+    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.write(JSON.stringify(data), 'utf-8');
+    response.end();
+
+    // Delete session
+    request.session.destroy();
+  });
+
+});
+
+app.post('/json/login', function (request, response) {
+
+  // Get Facebook credentials from Access Token
+  var http = '/debug_token';
+  var params = { input_token: request.body.token, access_token: APP_TOKEN };
+
+  FB.api(http, params, function (data){
+    // Populate Session
+    request.session.facebookid = data.data.user_id;
+
+    // Verify if Facebook User ID exists in the database
+    var query = "SELECT * FROM `" + database + "`.`mp_users` WHERE `mp_users`.`facebook_id` = ?";
+    var params = [request.session.facebookid];
+
+    connection.query(query, params, function (error, results, fields){
+      if(error) throw error;
+
+      // ===== If Facebook User ID exists ===== //
+      if(results.length != 0){
+
+        var http = '/oauth/access_token';
+        var params = { grant_type: 'fb_exchange_token', client_id: APP_ID, client_secret: APP_SECRET, fb_exchange_token: request.body.token };
+
+        FB.api(http, params, function (data){
+
+          var query = "UPDATE `" + database + "`.`mp_users` SET `token` = ?, `expires` = ? WHERE `mp_users`.`facebook_id` = ?";
+          var params = [data.access_token, data.expires_at, request.session.facebookid];
+          connection.query(query, params, function (error, results, fields){
+            if(error) throw error;
+
+            // Populate Session
+            request.session.token       = data.access_token;
+            request.session.expires     = data.expires_at;
+
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.write(JSON.stringify(results), 'utf-8');
+            response.end();
+          });
+        });
+      }
+      // ===== If Facebook User ID does not exist ===== //
+      else {
+
+        // Get longer-lived Access Token
+        var http = '/oauth/access_token';
+        var params = { grant_type: 'fb_exchange_token', client_id: APP_ID, client_secret: APP_SECRET, fb_exchange_token: request.body.token };
+
+        FB.api(http, params, function (data){
+
+          // Populate session
+          request.session.token       = data.access_token
+          request.session.expires     = data.expires_at;
+
+          // Insert new user in the database
+          var query = "INSERT INTO `" + database + "`.`mp_users`(`facebook_id`, `token`, `expires`) VALUES(?, ?, ?)";
+          var params = [request.session.facebookid, request.session.token, request.session.expires];
+
+          connection.query(query, params, function (error, results, fields){
+            if(error) throw error;
+
+            response.writeHead(200, {'Content-Type': 'application/json'});
+            response.write(JSON.stringify(results), 'utf-8');
+            response.end();
+          });
+
+        });
+      }
+
+    });
+
+  });
+
+});
+
+app.post('/json/session/login', function (request, response) {
+
+  // ===== If user session does not exist ===== //
+  if(request.session.facebookid == null) {
+    console.log("If user session does not exist");
+    /***** CLIENT SIDE - Open Facebook Authentification Dialog *****/
+    response.writeHead(200, {'Content-Type': 'application/json'});
+    response.write(JSON.stringify({ action: 'authenticateWithFacebook' }), 'utf-8');
+    response.end();
+  }
+  // ===== If user session exists ===== //
+  else {
+    console.log("If user session exists");
+    response.writeHead(200, {'Content-Type': 'application/json'});
+    response.end('\n');
+  }
+
+});
+
+/* ==============================
+          Helper Functions
+   ============================== */
+
 app.get('/json/session/pin', function (request, response) {
   if(typeof request.session != 'undefined') {
     response.writeHead(200, { 'Content-type': 'application/json' });
@@ -70,6 +199,7 @@ app.get('/json/session/pin', function (request, response) {
 });
 
 app.post('/json/session/pin', function (request, response) {
+  
   if(request.body.music != 'undefined' && request.body.music != null)
     request.session.music = request.body.music;
   else if(request.body.location != 'undefined' && request.body.location != null)
@@ -125,7 +255,7 @@ app.get('/json/user/:user_id', function (request, response){
 });
 
 // Facebook Authentification
-app.post('/json/facebookauth', function (request, response){
+/*app.post('/json/facebookauth', function (request, response){
   var query = "SELECT * FROM `" + database + "`.`mp_users` WHERE `mp_users`.`user` = ?";
   connection.query(query, [request.body.user], function (error, results, fields){
     if(error) throw error;
@@ -156,7 +286,7 @@ app.post('/json/facebookauth', function (request, response){
     }
   }); 
 });
-
+*/
 // Update token
 app.put('/json/facebookauth', function (request, response){
   var params = [request.body.token, request.body.id];

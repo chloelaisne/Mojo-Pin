@@ -9,14 +9,12 @@ App.FriendsView = Backbone.View.extend({
 	initialize: function(){
 		
 		_.bindAll(this, 'render', 'filter');
-		
-//		this.facebookAuth = new App.FacebookAuth();
 
 		this.collection = new App.FriendsCollection();
 		this.collection.bind('reset', this.render, this);
         this.collection.bind('add', this.render, this);
 
-        this.collection.fetch();
+        //this.collection.fetch();
 
 	},
 

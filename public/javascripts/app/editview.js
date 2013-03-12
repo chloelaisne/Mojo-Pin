@@ -29,7 +29,7 @@ App.EditView = Backbone.View.extend({
 
 	setRoute: function(route)
 	{
-		this.view = route;
+		this.model.set({ route: route });
 
 		// Render view
 		this.renderRoute();
@@ -52,7 +52,6 @@ App.EditView = Backbone.View.extend({
 		({
 			"description"			: this.views.editDescription.model.get("description")
 		});
-		this.editNavigation.setDescriptionNavigationState(true);
 	},
 
 	renderEditDescription: function()
@@ -130,29 +129,31 @@ App.EditView = Backbone.View.extend({
 			type 	: 'GET'
 		})
 		.done(function (cookie, textStatus, jqXHR){
+			self.model.set({ route: "music" });
+
 			// Initialize Music view with Model data or Session data
-			if(typeof cookie.music != 'undefined'  && cookie.music != null)
+			if(typeof cookie.music != 'undefined'  && cookie.music != null){
 				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
-			else if(typeof self.views.editMusic == 'undefined')
+				self.model.set({ route: "location" });
+			}
+			else if(typeof self.views.editMusic == 'undefined'){
 				self.views.editMusic = new App.EditMusicView();
+			}
 
 			// Initialize Location view with Session data
-			if(typeof cookie.location != 'undefined'  && cookie.location != null)
+			if(typeof cookie.location != 'undefined'  && cookie.location != null){
 				self.views.editLocation = new App.EditLocationView({ model: new App.Location({ reference: cookie.location }) });
-			else if(typeof self.views.editLocation == 'undefined')
+				self.model.set({ route: "description" });
+			}
+			else if(typeof self.views.editLocation == 'undefined'){
 				self.views.editLocation = new App.EditLocationView();
-
-			// Initialize Route model with Session data
-			if(typeof cookie.route != 'undefined')
-				self.model.set({ "route": cookie.route });
+			}
 
 			// Render view
 			self.renderRoute();
 
 		})
-		.fail(function (jqXHR, textStatus, errorThrown){
-			console.log("fail");
-		});
+		.fail(function (jqXHR, textStatus, errorThrown){ console.log("getSession fail"); });
 	},
 
 	setClassname: function()
@@ -162,25 +163,26 @@ App.EditView = Backbone.View.extend({
 
 	renderRoute: function()
 	{
-		switch(this.view)
+		switch(this.model.get("route"))
 		{
 			case "description":
+				console.log("renderRoute Description");
 				this.model.set({ "classname": "description"});
 				this.renderEditDescription();
-				this.editNavigation.editDescriptionViewNavigation();
+				this.editNavigation.setDescriptionNavigationState();
 				break;
 			case "location":
+				console.log("renderRoute Description");
 				this.model.set({ "classname": "location"});
 				this.renderEditLocation();
-				this.editNavigation.editLocationViewNavigation();
+				this.editNavigation.setLocationNavigationState();
 				break;
-			default:
+			case "music":
 				this.model.set({ "classname": "music"});
 				this.renderEditMusic();
-				this.editNavigation.editMusicViewNavigation();
+				this.editNavigation.setMusicNavigationState();
 				break;
 		}
-		console.log('2');
 		this.editNavigation.render();
 	},
 
@@ -191,11 +193,9 @@ App.EditView = Backbone.View.extend({
 	setSession: function(name)
 	{
 		if(name == 'music')
-			object = { music 	: this.views.editMusic.model.get("uri") };
+			object = { music: this.views.editMusic.model.get("uri") };
 		else if(name == 'location')
-			object = { location : this.views.editLocation.model.get("reference") };
-		else if(name == 'route')
-			object = { route: this.model.get("route") };
+			object = { location: this.views.editLocation.model.get("reference") };
 
 		$.ajax({
 			url 	: 'http://localhost:3000/json/session/pin',

@@ -2,9 +2,8 @@ App.NoticeWindowView = Backbone.View.extend({
 
 	model: App.NoticeWindow,
 
-	initialize: function(){
-		Backbone.View.apply(this, arguments);
-        google.maps.OverlayView.apply(this, arguments);
+	initialize: function()
+	{
 	}
 	
 });
@@ -13,7 +12,7 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 
 	initialize: function(options)
 	{
-		this.setMap(this.options.map);
+		this.setMap(this.options.map.map);
 	},
 
 	onAdd: function()
@@ -21,16 +20,16 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 		var div = document.createElement('div');
 		div.className = "window notice";
 
-		var music = document.createElement('div');
-		music.className = "music";
-		music.innerHTML = '<span class="mp-track"></span><span>' + this.options.title + '</span> by ' + this.options.artists;
+		this.music = document.createElement('div');
+		this.music.className = "music";
+		this.music.innerHTML = '<span class="mp-track"></span><span>' + this.options.title + '</span> by ' + this.options.artists;
 
-		var location = document.createElement('div');
-		location.className = "location";
-		location.innerHTML = '<span class="mp-location"></span>' + this.options.location;
+		this.location = document.createElement('div');
+		this.location.className = "location";
+		this.location.innerHTML = '<span class="mp-location"></span>' + this.options.location;
 
-		div.appendChild(music);
-		div.appendChild(location);
+		div.appendChild(this.music);
+		div.appendChild(this.location);
 
 		this.div_ = div;
 		
@@ -39,7 +38,7 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 
 		this.width = $(div).outerWidth();
 		this.height = $(div).outerHeight();
-		this.radius = 10;
+		this.radius = 6;
 		this.arrowwidth = 17;
 		this.arrowheight = 7;
 
@@ -67,6 +66,8 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 		context.fillStyle = gradient;
 		context.fill();
 
+		div.appendChild(canvas);
+
 		div.insertBefore(canvas, div.firstChild);
 
 		panes.overlayLayer.removeChild(div);
@@ -75,15 +76,23 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 
 	draw: function()
 	{
-		var position = this.getProjection().fromLatLngToDivPixel(this.options.latlng);
+		/*var position = this.getProjection().fromLatLngToDivPixel(this.options.latlng);
 		this.div_.style.left = position.x - (this.width / 2) + "px";
-		this.div_.style.top = position.y - this.height - 34 - (this.arrowheight * 2) + "px";
+		this.div_.style.top = position.y - this.height - 34 - (this.arrowheight * 2) + "px";*/
+		this.position = this.getProjection().fromLatLngToDivPixel(this.options.latlng);
+		this.xMargin = (this.arrowwidth * 2);
+		this.yMargin = 45;
+
+		this.div_.style.left = this.position.x + this.xMargin + "px";
+		this.div_.style.top = this.position.y - this.yMargin + "px";
 	},
 
-	onRemove: function()
+	remove: function()
 	{
+		google.maps.event.removeListener(this.mousemoveListener);
+		google.maps.event.removeListener(this.clickListener);
+		google.maps.event.removeListener(this.dragendListener);
 		this.div_.parentNode.removeChild(this.div_);
-		this.div_ = null;
 	}
 
 });

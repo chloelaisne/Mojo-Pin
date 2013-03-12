@@ -9,12 +9,21 @@ App.LocationView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'locationClick', 'render');
+		_.bindAll(this, 'locationClick', 'locationEnter', 'render');
+		App.Events.on("locationEnter", this.locationEnter);
+	},
+
+	locationEnter: function(e)
+	{
+		if($(this.el).hasClass("active"))
+			this.locationClick();
 	},
 
 	locationClick: function(e)
 	{
-		e.preventDefault();
+		if(typeof e != 'undefined')
+			e.preventDefault();
+
 		App.Events.trigger("setLocation",
 		{
 			reference	: this.model.get('reference'),

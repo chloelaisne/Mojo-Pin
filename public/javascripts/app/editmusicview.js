@@ -7,12 +7,32 @@ App.EditMusicView = Backbone.View.extend({
 
 	events:
 	{
-		"click #dropzone": "removeMusic"
+		"click #dropzone"	: "removeMusic",
+		"mouseover .track" 	: "setStyleOver",
+		"mouseleave .track" : "setStyleLeave",
+		"click .track"		: "setCurrentTrack"
+	},
+
+	addPlaying: function()
+	{
+
+	},
+
+	setStyleOver: function()
+	{
+		$(".player .volume.on").css("background-position", "0 -24px");
+		$(".player .volume.off").css("background-position", "0 -36px");
+	},
+
+	setStyleLeave: function()
+	{
+		$(".player .volume.on").css("background-position", "0 0");
+		$(".player .volume.off").css("background-position", "0 -12px");
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
+		_.bindAll(this, 'setStyleOver', 'setStyleLeave', 'addPlaying', 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
 
 		App.Events.on("onSearchChanged", this.setUri);
 
@@ -49,9 +69,14 @@ App.EditMusicView = Backbone.View.extend({
 			App.Events.trigger('delSession', 'music');
 	},
 
+	setCurrentTrack: function()
+	{
+		this.model.set({ uri: Spotify.Player.track.uri });
+	},
+
 	setUri: function(uri)
 	{
-		this.model.set ({ uri: uri });
+		this.model.set({ uri: uri });
 	},
 
 	renderDragDropModule: function()

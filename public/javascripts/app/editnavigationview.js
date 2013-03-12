@@ -17,8 +17,6 @@ App.EditNavigationView = Backbone.View.extend({
 		this.model.bind("change:music"		, this.setMusicNavigationState);
 		this.model.bind("change:location"	, this.setLocationNavigationState);
 		this.model.bind("change:description", this.setDescriptionNavigationState);
-
-		this.editMusicViewNavigation();
 	},
 
 	setMusicNavigationState: function()
@@ -29,33 +27,37 @@ App.EditNavigationView = Backbone.View.extend({
 
 	setLocationNavigationState: function()
 	{
+		console.log("setLocationNavigationState");
 		this.editLocationViewNavigation();
 		this.render();
 	},
 
 	setDescriptionNavigationState: function()
 	{
+		console.log("setDescriptionNavigationState");
 		this.editDescriptionViewNavigation();
 		this.render();
 	},
 
 	editMusicViewNavigation: function()
 	{
-		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: 1, route: "/user/chloelaisne" };
+		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: 1, goto: null };
 		this.next = { id: 'music', goto: 'location', label: "Next", theme: "crossbreed", icon: 1, state: this.model.get("music"), route: "edit/location" };
 		this.cancel = { route: null };
 	},
 
 	editLocationViewNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/music" };
+		console.log("editLocationViewNavigation");
+		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, goto: "music" };
 		this.next = { id: 'location', goto: 'description', label: "Next", theme: "light", icon: 1, state: this.model.get("location"), route: "edit/description" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
 
 	editDescriptionViewNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, route: "edit/location" };
+		console.log("editDescriptionViewNavigation");
+		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, goto: "location" };
 		this.next = { id: 'description', goto: null, label: "Done", theme: "primary", icon: 0, state: this.model.get("description"), route: "/user/chloelaisne" };
 		this.cancel = { route: "/user/chloelaisne" };
 	},
@@ -63,15 +65,14 @@ App.EditNavigationView = Backbone.View.extend({
 	clickPrevious: function(e)
 	{
 		e.preventDefault();
-		if(this.previous.route != null && this.previous.state == true)
+		if(this.previous.goto != null && this.previous.state == true)
 		{
-			App.router.navigate(this.previous.route, true);
+			App.Events.trigger('changeRoute', this.previous.goto);
 		}
 	},
 
 	clickNext: function(e)
 	{
-		console.log("clickNext", this.next.id, this.next.goto);
 		e.preventDefault();
 		if(this.next.route != null && this.next.state == true)
 		{
@@ -96,8 +97,6 @@ App.EditNavigationView = Backbone.View.extend({
 	{
 		// Unrender navigation
 		this.unrender();
-
-		//console.log('setButtonState', this.next.state);
 
 		this.templateSettings =
 		{

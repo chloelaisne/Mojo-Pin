@@ -2,7 +2,6 @@ App.EditLocationView = Backbone.View.extend({
 	
 	initialize: function()
 	{
-		console.log("initialize EditLocationView");
 		_.bindAll(this, 'setLocation', 'renderSearchModule', 'renderMapModule', 'render');
 		this.searchLocationModuleView = new App.SearchLocationModuleView();
 		this.mapModuleView = new App.MapModuleView({ id: "map_location" });
@@ -13,7 +12,11 @@ App.EditLocationView = Backbone.View.extend({
 		}
 		else
 		{
-			this.setLocation({ reference: this.model.get("reference") });
+			this.setLocation({
+				reference 	: this.model.get("reference"),
+				description : this.model.get("description")
+			});
+			this.model.getDetails();
 		}
 
 		this.model.bind("change:reference", this.model.getDetails);
@@ -38,7 +41,6 @@ App.EditLocationView = Backbone.View.extend({
 		{
 			this.model.unset("description", { silent: true });
 			this.model.unset("reference", { silent: true });
-			App.Events.trigger("changeLocation", this.model.get("reference"));
 		}
 	},
 
@@ -51,7 +53,7 @@ App.EditLocationView = Backbone.View.extend({
 	{
 		if(model != undefined)
 		{
-			this.mapModuleView.addMarker(model);
+			this.mapModuleView.addConfirmationMarker(model);
 		}
 		$(this.el).prepend((this.mapModuleView.render()).el);
 	},
