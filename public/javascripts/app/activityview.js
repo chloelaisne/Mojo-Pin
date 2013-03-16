@@ -1,26 +1,36 @@
 App.ActivityView = Backbone.View.extend({
 
-	tagName: 'li',
-
-	model: App.Activity,
+	events: {
+		"click": "clickActivity"
+	},
 
 	template: _.template(Templates.Activity),
 
-	initialize: function(){
-//		console.log('initialize ActivityView');
+	initialize: function()
+	{
+		_.bindAll(this, 'clickActivity', 'render');
+
+		this.model.bind("change", this.render);
 	},
 
-	render: function(){
-//		console.log('render ActivityView');
-		
+	clickActivity: function(e)
+	{
+		App.Events.trigger("ActivitySelected", this.model);
+	},
+
+	render: function()
+	{
+
 		this.templateSettings = {
 			type		: this.model.get("type"),
 			title		: this.model.get("title"),
 			artists		: this.model.get("artists"),
-			location	: this.model.get("location")
+			location	: this.model.get("description")
 		};
 
-		$(this.el).html(this.template(this.templateSettings));
+		this.setElement(this.template(this.templateSettings));
+
+		return this;
 	}
 	
 });

@@ -6,33 +6,30 @@ App.FriendsView = Backbone.View.extend({
 		"keyup input": "filter"
 	},
 
-	initialize: function(){
-		
-		_.bindAll(this, 'render', 'filter');
+	initialize: function()
+	{	
+		_.bindAll(this, 'renderFriendlist', 'setCollectionUrl', 'render', 'filter');
 
 		this.collection = new App.FriendsCollection();
 		this.collection.bind('reset', this.render, this);
         this.collection.bind('add', this.render, this);
 
-        //this.collection.fetch();
-
+        App.Events.on("changeAccessToken", this.setCollectionUrl);
 	},
 
-	render: function(){
-		$(this.el).html(this.template);
-
-		var self = this;
-
-		this.renderFriendslist();
-
-		return this;
+	setCollectionUrl: function(access_token)
+	{
+		this.collection.url = "https://graph.facebook.com/me/friends?access_token=" + access_token;
+		this.collection.fetch();
 	},
 
-	renderFriendslist: function(){
+	renderFriendlist: function()
+	{
 		if(this.$(".friendslist"))
 			this.$(".friendslist").children().remove();
 
-		_(this.collection.models).each(function(friend) {
+		_(this.collection.models).each(function(friend)
+		{
 			var friendView = new App.FriendView({ model: new App.Friend(friend) });
 			this.$(".friendslist").append((friendView.render()).el);
 		});
@@ -40,10 +37,20 @@ App.FriendsView = Backbone.View.extend({
 		return this;
 	},
 
-	filter: function(e){
+	filter: function(e)
+	{
 		this.collection.filter($(e.target).val());
 
-		this.renderFriendslist();
+		this.renderFriendlist();
+	},
+
+	render: function()
+	{
+		$(this.el).html(this.template);
+
+		this.renderFriendlist();
+
+		return this;
 	}
 	
 });

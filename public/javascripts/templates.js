@@ -76,23 +76,31 @@ Templates.SearchMusic = 		'<div id="search" id="music">' +
 									'</form>' +
 								'</div>';
 
-Templates.Profile = 			'<div id="top">' +
-									'<div class="picture"></div>' +
-									'<div class="information">' +
-										'<div class="name">Chloé Laisné</div>' +
-										'<div class="statistics">' +
-											'<p id="location"><span class="mp-marker"></span>Berlin, Germany</p>' +
-											'<p id="memories"><span class="mp-disc"></span>9 memories</p>' +
-										'</div>' +
+Templates.ProfileHeader = 		'<div class="picture"></div>' +
+								'<div class="information">' +
+									'<div class="name"><%= fullname %></div>' +
+									'<div class="statistics">' +
+										'<p id="location"><span class="mp-marker"></span><%= location %></p>' +
+										'<p id="memories"><span class="mp-disc"></span>9 memories</p>' +
 									'</div>' +
-								'</div>' +
-								'<div id="sidebar"></div>' +
-								'<div id="map_profile"></div>';
+								'</div>';
+
+Templates.Profile = 			'<div id="top"></div>' +
+								'<div id="middle">' +
+									'<div id="sidebar"></div>' +
+								'</div>';
+
+Templates.EmptyActivityModule = '<p>Your memory map<br/>is currently empty.</p>' +
+								'<button id="goto-pin" class="sp-button">Add pin</button>';
 
 Templates.Login = 				'<h2>Please Log In with Facebook to Continue</h2>' +
 								'<span class="mp-login">Log In</span>';
 
-Templates.Activity = '<div class="music"><span class="<%= type %>"></span><b><%= title %></b> by <%= artists %></div><div class="location"><%= location %></div>';
+Templates.Activity = 			'<li>' +
+									'<div class="music"><span class="<%= type %>"></span><b><%= title %></b> by <%= artists %></div>' +
+									'<div class="location"><%= location %></div>' +
+								'</li>';
+
 Templates.Friend = '<li style="display:<%= display %>"><div class="picture"><img src="<%= picture %>" alt="<%= name %>\'s profile picture"/><button class="sp-button">Send Invitation</button></div><a><span><%= name %></span></a></li>';
 Templates.Friends = '<div><form id="filter"><input type="text" value="Filter"/></form><ul class="friendslist"></ul></div>';
 Templates.TrackResults = '<div class="title" id="tracks">Tracks</div><ul></ul>';

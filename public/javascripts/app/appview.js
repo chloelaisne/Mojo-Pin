@@ -29,19 +29,6 @@ App.AppView = Backbone.View.extend({
 		Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, this.linksChanged);
 
 		App.Events.on('FacebookAuthDialog', this.facebookAuthDialog);
-
-		var self = this;
-
-		// Verify if user session exists
-		$.ajax({
-			type: 'POST',
-			url: 'http://localhost:3000/json/session/user'
-		})
-		.done(function (data, textStatus, jqXHR){
-			// If user session does not exist, redirect to Facebook Auth Dialog
-			if(data.action == 'authenticateWithFacebook')
-				self.facebookAuthDialog();
-		});
 	},
 
 	logout: function()
@@ -79,10 +66,21 @@ App.AppView = Backbone.View.extend({
 
 	facebookAuthSuccess: function(token, ttl)
 	{
+		var self = this;
+
 		$.ajax({
 			type 	: 'POST',
 			url		: 'http://localhost:3000/json/login',
 			data 	: { token: token }
+		})
+		.done(function (data, textStatus, jqXHR) {
+			// Get user session
+			self.model.set({
+				access_token	: data.access_token,
+				expires_at		: data.expires_at,
+				user_id			: data.user_id
+			});
+			App.Events.trigger("changeAccessToken", self.model.get("access_token"));
 		});
 
 		// Navigate to main route

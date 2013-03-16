@@ -1,17 +1,39 @@
+// Declare namespace
 window.App = {
 
 	OFFLINE: 2,
 
 	ONLINE: 1,
 
-	initialize: function()
-	{
-		//this.resizeSidebar();
-		this.loadMaps();
+	GOOGLE_MAPS: {
+		API_KEY	: 'AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ',
+		SENSOR	: false
 	},
 
-	loadMaps: function()
+	initialize: function()
 	{
+		var self = this;
+
+		// Verify if user session exists
+		$.ajax({
+			type: 'POST',
+			url: 'http://localhost:3000/json/session/user'
+		})
+		.done(function (data, textStatus, jqXHR){
+			// If user session does not exist, redirect to Facebook Auth Dialog
+			if(data.action == 'authenticateWithFacebook') {
+				App.Events.trigger('FacebookAuthDialog');
+			}
+			// If user session does exist, return user session
+			else {
+				self.FACEBOOK 				= {};
+				self.FACEBOOK.ACCESS_TOKEN 	= data.access_token;
+				self.FACEBOOK.EXPIRES_AT 	= data.expires_at;
+				self.FACEBOOK.USER_ID 		= data.user_id;
+
+				App.Events.trigger("changeAccessToken", self.FACEBOOK.ACCESS_TOKEN);
+			}
+		});
 	},
 
 	resizeSidebar: function(){

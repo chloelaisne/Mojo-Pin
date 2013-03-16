@@ -3,11 +3,12 @@
  * Module dependencies.
  */
 
-var express   = require('express')
-  , mysql     = require('mysql')
-  , fs        = require('fs')
-  , events    = require('events')
-  , FB        = require('fb');
+var express   = require('express');
+var mysql     = require('mysql');
+var fs        = require('fs');
+
+// NodeJS Library for Facebook. More at https://github.com/Thuzi/facebook-node-sdk.
+var FB        = require('fb');
 
 var app = express();
 app.listen(3000);
@@ -71,14 +72,13 @@ app.get('*', function (request, response, next){
    ==================== SESSION
    ================================================== */
 
-
 // Logout user from Facebook account
 app.post('/json/logout', function (request, response) {
 
   // Delete user permissions
   var http = request.session.facebookid + '/permissions';
   FB.api(http, 'delete', function (data) {
-    response.writeHead(200, { 'Content-Type': 'text/html' });
+    response.writeHead(200, { 'Content-Type': 'application/json' });
     response.write(JSON.stringify(data), 'utf-8');
     response.end();
 
@@ -114,16 +114,22 @@ app.post('/json/login', function (request, response) {
         FB.api(http, params, function (data){
 
           var query = "UPDATE `" + database + "`.`mp_users` SET `token` = ?, `expires` = ? WHERE `mp_users`.`facebook_id` = ?";
-          var params = [data.access_token, data.expires_at, request.session.facebookid];
+          var params = [data.access_token, data.expires, request.session.facebookid];
           connection.query(query, params, function (error, results, fields){
             if(error) throw error;
 
             // Populate Session
             request.session.token       = data.access_token;
-            request.session.expires     = data.expires_at;
+            request.session.expires     = data.expires;
 
+            // Return user session
+            var session = JSON.stringify({
+              user_id       : request.session.facebookid,
+              access_token  : request.session.token,
+              expires_at    : request.session.expires
+            });
             response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(JSON.stringify(results), 'utf-8');
+            response.write(session, 'utf-8');
             response.end();
           });
         });
@@ -139,7 +145,7 @@ app.post('/json/login', function (request, response) {
 
           // Populate session
           request.session.token       = data.access_token
-          request.session.expires     = data.expires_at;
+          request.session.expires     = data.expires;
 
           // Insert new user in the database
           var query = "INSERT INTO `" + database + "`.`mp_users`(`facebook_id`, `token`, `expires`) VALUES(?, ?, ?)";
@@ -148,8 +154,14 @@ app.post('/json/login', function (request, response) {
           connection.query(query, params, function (error, results, fields){
             if(error) throw error;
 
+            // Return user session
+            var session = JSON.stringify({
+              user_id       : request.session.facebookid,
+              access_token  : request.session.token,
+              expires_at    : request.session.expires
+            });
             response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(JSON.stringify(results), 'utf-8');
+            response.write(session, 'utf-8');
             response.end();
           });
 
@@ -174,8 +186,15 @@ app.post('/json/session/user', function (request, response) {
   }
   // ===== If user session exists ===== //
   else {
+    // Return user session
+    var session = JSON.stringify({
+      user_id       : request.session.facebookid,
+      access_token  : request.session.token,
+      expires_at    : request.session.expires
+    });
     response.writeHead(200, {'Content-Type': 'application/json'});
-    response.end('\n');
+    response.write(session, 'utf-8');
+    response.end();
   }
 
 });
@@ -248,58 +267,27 @@ app.get('/json/user/:user_id', function (request, response){
   });
 });
 
-// Facebook Authentification
-/*app.post('/json/facebookauth', function (request, response){
-  var query = "SELECT * FROM `" + database + "`.`mp_users` WHERE `mp_users`.`user` = ?";
-  connection.query(query, [request.body.user], function (error, results, fields){
+
+// ===== PINS ===== //
+
+// Return pin from user parameter - Facebook ID
+app.get('/json/pins/:user', function (request, response){
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id` = `mp_pins`.`location_id` AND `mp_musics`.`id` = `mp_pins`.`music_id`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
+  connection.query(query, function (error, results, fields){
     if(error) throw error;
-    if(results && results.length == 1){
-      if(results[0].token == request.body.token){
-        var query = "UPDATE `" + database + "`.`mp_users` SET `token` = ? WHERE `mp_users`.`user` = ?";
-        connection.query(query, [request.body.token, request.body.user], function (error, results, fields){
-          if(error) throw error;
-          response.writeHead(200, {'Content-Type': 'application/json'});
-          response.write(JSON.stringify(results), 'utf-8');
-          response.end('\n');
-        });
-      }
-      else{
-        response.writeHead(200, {'Content-Type': 'application/json'});
-        response.write(JSON.stringify(results), 'utf-8');
-        response.end('\n');
-      }
-    }
-    else{
-      var query = "INSERT INTO `" + database + "`.`mp_users`(`id`, `user`, `token`) VALUES(NULL, ?, ?)";
-      connection.query(query, [request.body.user, request.body.token], function (error, results, fields){
-        if(error) throw error;
-        response.writeHead(200, {'Content-Type': 'application/json'});
-        response.write(JSON.stringify(results), 'utf-8');
-        response.end('\n');
-      });
-    }
-  }); 
-});
-*/
-// Update token
-app.put('/json/facebookauth', function (request, response){
-  var params = [request.body.token, request.body.id];
-  var query = "UPDATE `" + database + "`.`mp_users` SET `token` = '?' WHERE `mp_users`.`id` = ?";
-  connection.query(query, params, function (error, results, fields){
-    if(error) throw error;
+    console.log(results);
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');
   });
 });
 
-// ===== PINS ===== //
-
 // Retrieve all pins
 app.get('/json/pins', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.id = `mp_pins`.user_id AND `mp_locations`.id = `mp_pins`.location_id AND `mp_musics`.id = `mp_pins`.music_id)";
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id` = `mp_pins`.`location_id` AND `mp_musics`.`id` = `mp_pins`.`music_id`)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
+    console.log(results);
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');

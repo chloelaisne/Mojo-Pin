@@ -23,8 +23,8 @@ App.SearchLocationModuleView = Backbone.View.extend({
 	{
 		_.bindAll(this, 'setLocation', 'searching', 'renderCollection', 'render');
 		this.locationsView = new App.LocationsView();
-		this.locationsCollection = new App.LocationsCollection();
-		this.locationsCollection.on("reset", this.renderCollection, this);
+		this.locations = new App.Locations();
+		this.locations.on("reset", this.renderCollection, this);
 
 		App.Events.on("setLocation", this.setLocation);
 	},
@@ -44,7 +44,7 @@ App.SearchLocationModuleView = Backbone.View.extend({
 		if(key == KEY_ARROWTOP || key == KEY_ARROWBOTTOM || key == KEY_ENTER)
 		{
 			console.log("KEY_ARROWTOP || KEY_ARROWTOP || KEY_ENTER");
-			if(this.locationsCollection.length != 0)
+			if(this.locations.length != 0)
 			{
 				console.log("Collection exists");
 				if($("#results li.active").length == 0)
@@ -55,14 +55,14 @@ App.SearchLocationModuleView = Backbone.View.extend({
 				{
 					if(key == KEY_ARROWTOP){
 						if(this.eq == 0){
-							this.eq = this.locationsCollection.length - 1;
+							this.eq = this.locations.length - 1;
 						}
 						else{
 							this.eq = this.eq - 1;
 						}
 					}
 					else if(key == KEY_ARROWBOTTOM){
-						if(this.eq == this.locationsCollection.length - 1){
+						if(this.eq == this.locations.length - 1){
 							this.eq = 0;
 						}
 						else{
@@ -86,7 +86,7 @@ App.SearchLocationModuleView = Backbone.View.extend({
 				dataType 	: 'json',
 				url 		: 'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=' + $(e.target).val() + '&types=geocode&sensor=true&key=AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ',
 			})
-			.done(function(data, textStatus, jqXHR){ self.locationsCollection.reset(data.predictions); })
+			.done(function(data, textStatus, jqXHR){ self.locations.reset(data.predictions); })
 			.fail(function(jqXHR, textStatus, errorThrown){ console.log("fail searching") });
 		}
 		
@@ -94,11 +94,11 @@ App.SearchLocationModuleView = Backbone.View.extend({
 
 	renderCollection: function()
 	{
-		this.locationsView.collection = this.locationsCollection;
+		this.locationsView.collection = this.locations;
 
 		this.$("#results").children().remove();
 
-		if(this.locationsCollection.length > 0)
+		if(this.locations.length > 0)
 		{
 			this.$("#results").html((this.locationsView.render()).el);
 			this.$("#results").show();

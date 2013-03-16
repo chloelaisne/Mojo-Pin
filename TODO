@@ -18,5 +18,7 @@
 ### 12/03/2013:
 - **DONE** / Facebook authentification
 - Display Facebook information on user profile
+- Populate app model: access token, user id, expires, etc
+- Change the friendlist access token 
 - Friend list
 - Friend profile

@@ -2,7 +2,7 @@ App.MapModuleView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'addNoticeMarker', 'resizeView', 'addConfirmationMarker', 'removeMarker', 'render');
+		_.bindAll(this, 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
 
 		App.Events.on("RemoveMarker", this.removeMarker);
 
@@ -12,21 +12,20 @@ App.MapModuleView = Backbone.View.extend({
 			panControl			: false,
 			mapTypeControl		: false,
 			streetViewControl	: false,
-			zoom				: 15
+			zoom				: 10
 		},
 
 		this.latlng = new google.maps.LatLng(-34.397, 150.644);
 		this.map = new google.maps.Map(this.el, this.options);
 		this.map.setCenter(this.latlng);
 
-		$(window).bind("resize", this.resizeView);
+		$(window).bind("resize", this.render);
 	},
 
-
-	resizeView: function()
+	setCenter: function(latitude, longitude)
 	{
-		var height = $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight();
-		$(this.el).height(height);
+		this.latlng = new google.maps.LatLng(latitude, longitude);
+		this.map.setCenter(this.latlng);
 	},
 
 	removeMarker: function(marker)
@@ -70,7 +69,7 @@ App.MapModuleView = Backbone.View.extend({
 	render: function()
 	{
 		$(this.el).css({
-			width: "100%",
+			width: $("body").width() - $("#sidebar").outerWidth(),
 			height: $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight()
 		});
 
