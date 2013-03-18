@@ -2,6 +2,7 @@ App.UserView = Backbone.View.extend({
 
 	initialize: function()
 	{
+		console.log('yolo');
 		_.bindAll(this, 'renderInformation', 'renderPins', 'loadCollection', 'setMapFocus', 'userDataLoaded', 'mapDataLoaded', 'render');
 
 		this.mapModuleView = new App.MapModuleView({ id: "map_profile" });
@@ -38,41 +39,54 @@ App.UserView = Backbone.View.extend({
 		this.renderInformation();
 
 		// Render profile picture
-		$("div.picture").css({ "background-image": "url(https://graph.facebook.com/me/picture?width=130&height=130&access_token=" + App.FACEBOOK.ACCESS_TOKEN + ")" });
+		this.$("div.picture").css({ "background-image": "url(https://graph.facebook.com/me/picture?width=130&height=130&access_token=" + App.FACEBOOK.ACCESS_TOKEN + ")" });
 	},
 
 	mapDataLoaded: function()
 	{
+		console.log(this.location.get("latitude"), this.location.get("longitude"));
 		// Set map center
 		this.mapModuleView.setCenter(this.location.get("latitude"), this.location.get("longitude"));
 	},
 
 	renderInformation: function()
 	{
-		this.informationTemplateSettings = {
-			fullname	: this.user.get("fullname"),
-			location	: this.user.get("location")
-		};
+		if(typeof this.user.get("fullname") != undefined){
+			this.informationTemplateSettings = {
+				fullname	: this.user.get("fullname"),
+				location	: this.user.get("location")
+			};
 
-		$("#top").html(_.template(Templates.ProfileHeader)(this.informationTemplateSettings));
+			this.$("#top").html(_.template(Templates.ProfileHeader)(this.informationTemplateSettings));
+		}
 	},
 
 	renderPins: function()
 	{
+		// Bind this to self for function below
+		var self = this;
+
+		// ===== If pin collection is empty ===== //
 		if(this.pins.length == 0)
 		{
-			$("#sidebar").html(Templates.EmptyActivityModule);
-			//$("#sidebar button").css({ "left": $("#sidebar").outerWidth() / 2 - $("#sidebar button").outerWidth() / 2 + "px" });
+			this.$("#sidebar").html(Templates.EmptyActivityModule);
+			this.$("#sidebar button").css({ "left": this.$("#sidebar").outerWidth() / 2 - this.$("#sidebar button").outerWidth() / 2 + "px" });
 		}
+		// ===== If pin collection is not empty ===== //
 		else {
 			var list = document.createElement("ul");
 
-			_(this.pins.models).each(function(activity) {
+			_(this.pins.models).each(function(activity)
+			{
+				// Append row of pin-related information to the sidebar
 				var activityView = new App.ActivityView({ model: new App.Activity(activity.attributes) });
 				$(list).append((activityView.render()).el);
+
+				// Append pin marker to the map
+				self.mapModuleView.addMarker(activity.attributes.latitude, activity.attributes.longitude);
 			});
 
-			$("#sidebar").html(list);
+			this.$("#sidebar").html(list);
 		}
 	},
 
@@ -81,6 +95,9 @@ App.UserView = Backbone.View.extend({
 		this.$el.html(Templates.Profile);
 
 		this.$("#middle").append((this.mapModuleView.render()).el);
+
+		this.renderInformation();
+		this.renderPins();
 
 		this.setElement($(this.el));
 		return this;

@@ -150,7 +150,7 @@ App.AppView = Backbone.View.extend({
 	showEdit: function(e)
 	{
 		e.preventDefault();
-		App.router.navigate('/edit/music', true);
+		App.router.navigate('/edit', true);
 	},
 
 	activeState: function(e)

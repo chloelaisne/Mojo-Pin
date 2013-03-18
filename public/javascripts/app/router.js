@@ -4,55 +4,33 @@ App.Router = Backbone.Router.extend({
 
 	routes:
 	{
-		//'news': 'news',
-
-		""					: "edit",
-		"offline"			: "offline",
-
-		"users"				: "users",
+		// Testing
+		""					: "user",
 		"user/*user"		: "user",
 
-		"edit/*action"		: "edit",
-		"login"				: "login"
+		"login"				: "login",
+		"offline"			: "offline",
+		"edit"				: "edit",
+
+		"users"				: "users"
+		
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'login', 'offline', 'setState', 'users', 'user', 'edit');
+		_.bindAll(this, 'login', 'offline', 'users', 'user', 'edit');
 
-		App.Events.on("StateChanged", this.setState);
+		this.views.app 			= new App.AppView({ el: $("body") });
 
-		this.views.app 		= new App.AppView({ el: $("body") });
+		this.views.login 		= new App.LoginView();
+		this.views.offline 		= new App.OfflineView();
+		this.views.edit			= new App.EditView();
+		this.views.user 		= new App.UserView();
 
-		this.views.offline 	= new App.OfflineView();
-		this.views.login 	= new App.LoginView();
-		this.views.edit		= new App.EditView();
-
-		
-
-		//this.views.news = new App.NewsView();
-		this.views.user = new App.UserView();
 		this.views.friends = new App.FriendsView();
 		
-
 		this.view = this.views.app;
         this.view.render();
-	},
-
-	setState: function(state)
-	{
-		if(state == App.OFFLINE)
-		{
-			this.views.app.model.set({
-				header		: false,
-				classname	: 'news'
-			});
-        	this.navigate('offline', true);
-		}
-		else
-		{
-			// ONLINE
-		}
 	},
 
 	offline: function()
@@ -72,15 +50,6 @@ App.Router = Backbone.Router.extend({
 		});
 		$('#global').html((this.views.edit.render()).el);
 	},
-
-	/*news: function()
-	{
-		this.views.app.model.set({
-			header		: true,
-			classname	: 'news'
-		});
-		$('#global').html((this.views.news.render()).el);
-	},*/
 
 	login: function()
 	{

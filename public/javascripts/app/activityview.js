@@ -15,6 +15,8 @@ App.ActivityView = Backbone.View.extend({
 
 	clickActivity: function(e)
 	{
+		$("#sidebar li").removeClass();
+		$(e.currentTarget).addClass("active");
 		App.Events.trigger("ActivitySelected", this.model);
 	},
 

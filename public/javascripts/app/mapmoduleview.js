@@ -1,8 +1,11 @@
 App.MapModuleView = Backbone.View.extend({
 
+	// Array of all markers on the map
+	markers: [],
+
 	initialize: function()
 	{
-		_.bindAll(this, 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
+		_.bindAll(this, 'addMarker', 'addWindow', 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
 
 		App.Events.on("RemoveMarker", this.removeMarker);
 
@@ -12,7 +15,7 @@ App.MapModuleView = Backbone.View.extend({
 			panControl			: false,
 			mapTypeControl		: false,
 			streetViewControl	: false,
-			zoom				: 10
+			zoom				: 7
 		},
 
 		this.latlng = new google.maps.LatLng(-34.397, 150.644);
@@ -38,6 +41,48 @@ App.MapModuleView = Backbone.View.extend({
 			if(typeof this.noticeWindowView != 'undefined')
 				this.noticeWindowView.remove();
 		}
+	},
+
+	/*
+	 * Append marker to map
+	 * @param latitude 	: latitude coordinate
+	 * @param longitude : longitude coordinate
+	 * @param map 		: instance of a map object
+	 */
+	addMarker: function(latitude, longitude, map)
+	{
+		var self = this;
+
+		// Create marker instance
+		var position = new google.maps.LatLng(latitude, longitude);
+		var markerOptions = {
+			position: position,
+			map: this.map
+		};
+		var marker = new google.maps.Marker(markerOptions);
+		// Set map canter to marker position
+		this.map.setCenter(position);
+
+		// Add marker to the array for further manipulations
+		this.markers.push(marker);
+
+		var markerEventListener = google.maps.event.addListener(marker, 'click', function(e){
+			self.addWindow(self.markers.length - 1, position);
+		});
+
+		// Return array index of the marker
+		return this.markers.length - 1;
+	},
+
+	/*
+	 * Append window overlay to map
+	 * @param index 	: index of the marker target
+	 * @param position 	: latitude and longitude of the marker target
+	 */
+	addWindow: function(index, position)
+	{
+		var informationWindow = new App.InformationWindowView({ map: this.map, latlng: position, description: 'Test' });
+		informationWindow.setMap(this.map);
 	},
 
 	addNoticeMarker: function(model)

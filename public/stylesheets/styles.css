@@ -132,6 +132,17 @@ body.login #global {
 	background: transparent url(../images/searchresults_icons.png) no-repeat left -76px;
 }
 
+.mp-locationsmall {
+	float: left;
+	display: block;
+	width: 9px;
+	height: 9px;
+	position: relative;
+	top: 4px;
+	margin-right: 8px;
+	background: transparent url(../images/location_icon.png) no-repeat left top;
+}
+
 .mp-plus {
 	float: left;
 	display: block;
@@ -473,7 +484,8 @@ nav ul li.active {
 	line-height: 14px;
 }
 
-#sidebar ul li:hover {
+#sidebar ul li:hover,
+#sidebar ul li.active {
 	border-top: 1px solid #9bd5f7;
 	border-bottom: 1px solid #95b7c8;
 	background: -webkit-linear-gradient(top, #afdff8 0%, #97d3f7 100%);
@@ -544,9 +556,12 @@ nav ul li.active {
 }
 
 .window .music,
-.window .location{
+.window .location,
+.window .information {
 	position: relative;
 	display: block;
+	text-align: left;
+	z-index: 100;
 }
 
 .window .sp-button {
@@ -569,9 +584,91 @@ nav ul li.active {
 	font-size: 11px;
 }
 
+.window.information {
+	box-shadow: 0 5px 10px rgba(0,0,0,.5);
+}
 
+.window.information p {
+	text-align: left;
+}
 
+.window.information .player {
+	background: -webkit-linear-gradient(top, #333333 0%, #262626 100%);
+	border-radius: 3px 3px 0 0;
+	width: 300px;
+	height: 80px;
+	border: 1px solid #101010;
+	box-shadow: 0 1px 0 rgba(255,255,255,.1) inset;
+}
 
+.window.information .player .left {
+	-webkit-border-image: -webkit-linear-gradient(rgba(0,0,0,1), rgba(0,0,0,0)) 0% 100%;
+	border-style: solid;
+	border-width: 0 1px 0 0;
+	border-left-width: 0;
+	overflow: hidden;
+	float: left;
+}
+
+.window.information .player .left .image {
+	display: block;
+	width: 68px;
+	height: 68px;
+	border-radius: 3px;
+	border: 1px solid #000000;
+	box-shadow: 0 0 4px rgba(0,0,0,0.5);
+	background: transparent url(../images/default_player.jpg) no-repeat left top;
+	margin: 6px;
+	float: left;
+}
+
+.window.information .player .right {
+	overflow: hidden;
+	height: 100%;
+	-webkit-border-image: -webkit-linear-gradient(rgba(76,76,76,1), rgba(76,76,76,0)) 0% 100%;
+	border-style: solid;
+	border-width: 0 0 0 1px;
+	border-right-width: 0;
+	padding-left: 9px;
+}
+
+.window.information .player .right .track {
+	font-size: 12px;
+	color: #ffffff;
+	font-family: "Arial Black", "Arial", sans-serif;
+	margin-top: 8px;
+}
+
+.window.information .player .right .artist {
+	color: #999999;
+	font-family: "Lucida Grande", "Arial", sans-serif;
+	font-size: 11px;
+	margin: -1px 0 9px 0;
+}
+
+.window.information .player .right .location {
+	color: #999999;
+	font-family: "Lucida Grande", "Arial", sans-serif;
+	font-size: 9px;
+	text-shadow: none;
+}
+
+.window.information .description {
+	color: #767676;
+	font-size: 11px;
+	font-family: "Arial", sans-serif;
+	border-radius: 0 0 3px 3px;
+	background: #ebeae8 url(../images/window_background.png) repeat-x left top; 
+	width: 272px;
+	padding: 10px 14px 12px 14px;
+	text-shadow: none;
+	border: 1px solid #333333;
+	margin-top: -1px;
+}
+
+.window.information .description p {
+	text-align: justify;
+}
 
 /*
  *
