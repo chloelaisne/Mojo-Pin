@@ -5,9 +5,10 @@ App.MapModuleView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'addMarker', 'addWindow', 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
+		_.bindAll(this, 'addMarker', 'onActivitySelected', 'addWindow', 'removeWindow', 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
 
 		App.Events.on("RemoveMarker", this.removeMarker);
+		App.Events.on("ActivitySelected", this.onActivitySelected);
 
 		this.options =
 		{
@@ -49,12 +50,14 @@ App.MapModuleView = Backbone.View.extend({
 	 * @param longitude : longitude coordinate
 	 * @param map 		: instance of a map object
 	 */
-	addMarker: function(latitude, longitude, map)
+	addMarker: function(model)
 	{
 		var self = this;
 
+		console.log(model);
+
 		// Create marker instance
-		var position = new google.maps.LatLng(latitude, longitude);
+		var position = new google.maps.LatLng(model.get("latitude_location"), model.get("longitude_location"));
 		var markerOptions = {
 			position: position,
 			map: this.map
@@ -63,26 +66,73 @@ App.MapModuleView = Backbone.View.extend({
 		// Set map canter to marker position
 		this.map.setCenter(position);
 
-		// Add marker to the array for further manipulations
-		this.markers.push(marker);
-
+		// ===== Google Maps events ===== //
+		this.toggleFlag = false;
 		var markerEventListener = google.maps.event.addListener(marker, 'click', function(e){
-			self.addWindow(self.markers.length - 1, position);
+			if(this.toggleFlag == false){
+				// Add window overlay
+				self.addWindow(model, 'details');
+				this.toggleFlag = true;
+				// Set map center with animated transition
+				self.map.panTo(position);
+			}
+			else {
+				// Remove window overlay
+				self.removeWindow();
+				this.toggleFlag = false
+			}
 		});
 
-		// Return array index of the marker
-		return this.markers.length - 1;
+		this.markers.push({ "object": marker, "data": model });
+	},
+
+	onActivitySelected: function(model)
+	{
+		for(i = 0; i < this.markers.length; i++){
+			if(model.get("id_pin") == this.markers[i].data.get("id_pin")){
+				google.maps.event.trigger(this.markers[i].object, 'click');
+				break;
+			}
+		}
 	},
 
 	/*
 	 * Append window overlay to map
 	 * @param index 	: index of the marker target
 	 * @param position 	: latitude and longitude of the marker target
+	 * @param layout	: type of visual layout
 	 */
-	addWindow: function(index, position)
+	addWindow: function(model, layout)
 	{
-		var informationWindow = new App.InformationWindowView({ map: this.map, latlng: position, description: 'Test' });
-		informationWindow.setMap(this.map);
+		switch(layout){
+			case 'details':
+				// Remove existing window overlay if does exist
+				this.removeWindow();
+				this.windowView = new App.InformationWindowView(model);
+			break;
+			case 'confirmation':
+				this.windowView = new App.ConfirmationWindowView({ map: model.map, latlng: this.position });
+			break;
+			case 'notification':
+				this.windowView = new App.NoticeWindowView({ map: model.map, latlng: this.position, description: model.location_description });
+			break;
+		}
+		this.windowView.setMap(this.map);
+	},
+
+	/*
+	 * Remove window overlay from map
+	 * @param index 	: index of the marker target
+	 * @param position 	: latitude and longitude of the marker target
+	 * @param layout	: type of visual layout
+	 */
+
+	removeWindow: function()
+	{
+		if(typeof this.windowView != 'undefined' && this.windowView != null && this.windowView.getMap() != null){
+			this.windowView.setMap(null);
+			this.windowView = null;
+		}
 	},
 
 	addNoticeMarker: function(model)

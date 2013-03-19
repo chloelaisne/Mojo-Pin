@@ -97,7 +97,7 @@ Templates.Login = 				'<h2>Please Log In with Facebook to Continue</h2>' +
 								'<span class="mp-login">Log In</span>';
 
 Templates.Activity = 			'<li>' +
-									'<div class="music"><span class="<%= type %>"></span><b><%= title %></b> by <%= artists %></div>' +
+									'<div class="music"><span></span><b><%= title %></b> by <%= artists %></div>' +
 									'<div class="location"><%= location %></div>' +
 								'</li>';
 

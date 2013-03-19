@@ -19,8 +19,8 @@ App.FriendsView = Backbone.View.extend({
 
 	setCollectionUrl: function(access_token)
 	{
-		this.collection.url = "https://graph.facebook.com/me/friends?access_token=" + access_token;
-		this.collection.fetch();
+		//this.collection.url = "https://graph.facebook.com/me/friends?access_token=" + access_token;
+		//this.collection.fetch();
 	},
 
 	renderFriendlist: function()

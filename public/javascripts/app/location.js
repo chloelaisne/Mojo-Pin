@@ -28,6 +28,9 @@ App.Location = Backbone.Model.extend({
 					longitude	: data.results[0].geometry.location.lng
 				});
 			}
+			else if(data.results.length == 0 && data.status != "OK"){
+				console.log("Google Maps error: " + data.status);
+			}
 
 		});
 	},

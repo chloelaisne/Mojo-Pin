@@ -6,7 +6,7 @@ window.App = {
 	ONLINE: 1,
 
 	GOOGLE_MAPS: {
-		API_KEY	: 'AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ',
+		API_KEY	: 'AIzaSyCSTzcjJfXnNFlnhe6x9hBzxCo5AxTOk88', // AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ
 		SENSOR	: false
 	},
 

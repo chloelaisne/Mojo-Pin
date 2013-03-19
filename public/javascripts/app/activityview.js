@@ -24,10 +24,9 @@ App.ActivityView = Backbone.View.extend({
 	{
 
 		this.templateSettings = {
-			type		: this.model.get("type"),
 			title		: this.model.get("title"),
 			artists		: this.model.get("artists"),
-			location	: this.model.get("description")
+			location	: this.model.get("description_location")
 		};
 
 		this.setElement(this.template(this.templateSettings));

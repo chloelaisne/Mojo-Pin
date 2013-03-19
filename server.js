@@ -113,7 +113,7 @@ app.post('/json/login', function (request, response) {
 
         FB.api(http, params, function (data){
 
-          var query = "UPDATE `" + database + "`.`mp_users` SET `token` = ?, `expires` = ? WHERE `mp_users`.`facebook_id` = ?";
+          var query = "UPDATE `" + database + "`.`mp_users` SET `facebook_token` = ?, `facebook_expires` = ? WHERE `mp_users`.`facebook_id` = ?";
           var params = [data.access_token, data.expires, request.session.facebookid];
           connection.query(query, params, function (error, results, fields){
             if(error) throw error;
@@ -148,7 +148,7 @@ app.post('/json/login', function (request, response) {
           request.session.expires     = data.expires;
 
           // Insert new user in the database
-          var query = "INSERT INTO `" + database + "`.`mp_users`(`facebook_id`, `token`, `expires`) VALUES(?, ?, ?)";
+          var query = "INSERT INTO `" + database + "`.`mp_users`(`facebook_id`, `facebook_token`, `facebook_expires`) VALUES(?, ?, ?)";
           var params = [request.session.facebookid, request.session.token, request.session.expires];
 
           connection.query(query, params, function (error, results, fields){
@@ -258,7 +258,7 @@ app.get('/json/users', function (request, response){
 
 // Retrieve defined user
 app.get('/json/user/:user_id', function (request, response){
-  var query = "SELECT * FROM `mp_users` WHERE `id` = " + connection.escape(request.params.user_id);
+  var query = "SELECT * FROM `mp_users` WHERE `id_user` = " + connection.escape(request.params.user_id);
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
@@ -272,7 +272,7 @@ app.get('/json/user/:user_id', function (request, response){
 
 // Return pin from user parameter - Facebook ID
 app.get('/json/pins/:user', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id` = `mp_pins`.`location_id` AND `mp_musics`.`id` = `mp_pins`.`music_id`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     console.log(results);
@@ -284,7 +284,7 @@ app.get('/json/pins/:user', function (request, response){
 
 // Retrieve all pins
 app.get('/json/pins', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id` = `mp_pins`.`location_id` AND `mp_musics`.`id` = `mp_pins`.`music_id`)";
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     console.log(results);
@@ -296,7 +296,7 @@ app.get('/json/pins', function (request, response){
 
 // Retrieve existing pin
 app.get('/json/pin/:pin_id', function (request, response){
-  var query = "SELECT * FROM `mp_pins` WHERE `id` = " + connection.escape(request.params.pin_id);
+  var query = "SELECT * FROM `mp_pins` WHERE `id_pin` = " + connection.escape(request.params.pin_id);
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
@@ -313,11 +313,11 @@ app.post('/json/pin', function (request, response){
 
   // Enter location in database: mp_locations
   // Or retrieve location identifier if location already exists
-  connection.query("SELECT * FROM `mp_locations` WHERE `reference` = '" + request.body.reference + "' LIMIT 0, 1", function (error, results){
+  connection.query("SELECT * FROM `mp_locations` WHERE `reference_location` = '" + request.body.reference + "' LIMIT 0, 1", function (error, results){
     if(error) throw error;
     if(!results.length){
       var parameters = [request.body.location_latitude, request.body.location_longitude, request.body.location_reference, request.body.location_description];
-      var query = "INSERT INTO `" + database + "`.`mp_locations`(`id`, `latitude`, `longitude`, `reference`, `description`) VALUES(NULL, ?, ?, ?, ?)";
+      var query = "INSERT INTO `" + database + "`.`mp_locations`(`id_location`, `latitude_location`, `longitude_location`, `reference_location`, `description_location`) VALUES(NULL, ?, ?, ?, ?)";
       connection.query(query, parameters, function (error, results){
         if(error) throw error;
         location_id = results.insertId;
@@ -334,7 +334,7 @@ app.post('/json/pin', function (request, response){
   connection.query("SELECT * FROM `mp_music` WHERE `uri` = '" + request.body.music_uri + "' LIMIT 0, 1", function (error, results){
     if(error) throw error;
     if(!results.length){
-      connection.query("INSERT INTO `" + database + "`.`mp_musics`(`id`, `uri`) VALUES(NULL, '" + request.body.music_uri + "')", function (error, results){
+      connection.query("INSERT INTO `" + database + "`.`mp_musics`(`id_music`, `uri_music`) VALUES(NULL, '" + request.body.music_uri + "')", function (error, results){
         if(error) throw error;
         music_id = results.insertId;
         console.log('Music entry inserted successfully in the database: ' + request.body.music_uri);
@@ -356,7 +356,7 @@ app.post('/json/pin', function (request, response){
     });
     // Enter pin entry in database: mp_pins
     var parameters = [request.body.description, user_id, location_id, music_id];
-    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id`, `description`, `user_id`, `location_id`, `music_id`) VALUES(NULL, ?, ?, ?, ?)";
+    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id_pin`, `description_pin`, `user_id`, `location_id`, `music_id`) VALUES(NULL, ?, ?, ?, ?)";
     connection.query(query, parameters, function (error, results){
       if(error) throw error;
       console.log('Pin entry inserted successfully in the database: ');

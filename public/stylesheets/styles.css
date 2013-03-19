@@ -561,7 +561,7 @@ nav ul li.active {
 	position: relative;
 	display: block;
 	text-align: left;
-	z-index: 100;
+	z-index: 1001;
 }
 
 .window .sp-button {

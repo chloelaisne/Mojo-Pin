@@ -2,19 +2,18 @@ App.UserView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		console.log('yolo');
+		console.log('yol4o');
 		_.bindAll(this, 'renderInformation', 'renderPins', 'loadCollection', 'setMapFocus', 'userDataLoaded', 'mapDataLoaded', 'render');
 
 		this.mapModuleView = new App.MapModuleView({ id: "map_profile" });
 
 		// Initialize the collection of pins
-		this.pins  = new App.Pins();
+		this.pins = new Backbone.Collection();
 		this.pins.bind('reset', this.renderPins)
 
 		this.user = new App.User();
 		this.user.bind("change", this.userDataLoaded);
 
-		App.Events.on("ActivitySelected", this.setMapFocus);
 		App.Events.on("changeAccessToken", this.loadCollection);
 	},
 
@@ -27,7 +26,7 @@ App.UserView = Backbone.View.extend({
 	setMapFocus: function(model)
 	{
 		// Set map center
-		this.mapModuleView.setCenter(model.get("latitude"), model.get("longitude"));
+		this.mapModuleView.setCenter(model.get("latitude_location"), model.get("longitude_location"));
 	},
 
 	userDataLoaded: function()
@@ -44,7 +43,6 @@ App.UserView = Backbone.View.extend({
 
 	mapDataLoaded: function()
 	{
-		console.log(this.location.get("latitude"), this.location.get("longitude"));
 		// Set map center
 		this.mapModuleView.setCenter(this.location.get("latitude"), this.location.get("longitude"));
 	},
@@ -63,7 +61,7 @@ App.UserView = Backbone.View.extend({
 
 	renderPins: function()
 	{
-		// Bind this to self for function below
+		// Bind this to self for functions below
 		var self = this;
 
 		// ===== If pin collection is empty ===== //
@@ -76,6 +74,9 @@ App.UserView = Backbone.View.extend({
 		else {
 			var list = document.createElement("ul");
 
+			// Reset markers array
+			this.mapModuleView.markers = [];
+			
 			_(this.pins.models).each(function(activity)
 			{
 				// Append row of pin-related information to the sidebar
@@ -83,7 +84,7 @@ App.UserView = Backbone.View.extend({
 				$(list).append((activityView.render()).el);
 
 				// Append pin marker to the map
-				self.mapModuleView.addMarker(activity.attributes.latitude, activity.attributes.longitude);
+				self.mapModuleView.addMarker(activityView.model);
 			});
 
 			this.$("#sidebar").html(list);
