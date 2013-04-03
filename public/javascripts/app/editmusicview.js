@@ -8,31 +8,12 @@ App.EditMusicView = Backbone.View.extend({
 	events:
 	{
 		"click #dropzone"	: "removeMusic",
-		"mouseover .track" 	: "setStyleOver",
-		"mouseleave .track" : "setStyleLeave",
 		"click .track"		: "setCurrentTrack"
-	},
-
-	addPlaying: function()
-	{
-
-	},
-
-	setStyleOver: function()
-	{
-		$(".player .volume.on").css("background-position", "0 -24px");
-		$(".player .volume.off").css("background-position", "0 -36px");
-	},
-
-	setStyleLeave: function()
-	{
-		$(".player .volume.on").css("background-position", "0 0");
-		$(".player .volume.off").css("background-position", "0 -12px");
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setStyleOver', 'setStyleLeave', 'addPlaying', 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
+		_.bindAll(this, 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
 
 		App.Events.on("onSearchChanged", this.setUri);
 
@@ -53,6 +34,11 @@ App.EditMusicView = Backbone.View.extend({
 
 		Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, this.renderPlayerModule);
 		
+		// Set the model URI when track dropped onto the Application tab
+		var self = this;
+		Spotify.Application.observe(Spotify.Models.EVENT.LINKSCHANGED, function(){
+			self.model.set({ uri: Spotify.Application.links[0] });
+		});
 	},
 
 	uriChanged: function()
@@ -108,28 +94,22 @@ App.EditMusicView = Backbone.View.extend({
 
 	renderPlayerModule: function()
 	{
-		if(this.$(".player"))
-			this.$(".player").remove();
+		// Append Template to DOM
+		if(this.$(".player").length == 0){
+			$(this.el).append(Templates.Player);
+		}
 
 		if(Spotify.Player.playing == true)
 		{
-			this.playername 	= Spotify.Player.track.name;
-			this.playerartists 	= Spotify.Player.track.artists.join(", ");
+			this.$(".player .track").html(Spotify.Player.track.name + " by " + Spotify.Player.track.artists.join(", "));
+			this.$(".player").css("display", "block");
 		}
 		else
 		{
-			this.playername 	= null;
-			this.playerartists 	= null;
+			this.$(".player").css("display", "none");
 		}
-
-		var playerTemplateSettings =
-		{
-			trackname 		: this.playername,
-			trackartists 	: this.playerartists
-		}
-
-		if(this.playername != null && this.playerartists != null)
-			$(this.el).append(_.template(Templates.Player)(playerTemplateSettings));
+		
+		return this;	
 	},
 
 	renderSearchModule: function()

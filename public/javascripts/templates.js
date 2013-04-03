@@ -11,8 +11,8 @@ Templates.Header = 				'<div id="header">' +
 									'</ul>' +
 									'<ul class="right">' +
 										'<li id="goto-friends">Friends</li>' +
-										'<li id="goto-pin" class="mp-icon"><span class="mp-plus"></span>Pin</li>' +
-										'<li id="goto-logout">Logout</li>' +
+										'<li id="goto-edit">Pin</li>' +
+										'<li id="goto-logout" class=" mp-icon"><span class="logout"></span>Logout</li>' +
 									'</ul>' +
 								'</nav>' +
 								'</div>';
@@ -45,7 +45,7 @@ Templates.EditDescription = 	'<div id="page-bottom">' +
 									'</div>' +
 								'</div>';
 
-Templates.Player = 				'<div class="player">Use currently playing:<span class="track"><span class="volume on"></span><%= trackname %> by <%= trackartists %></span></div>'
+Templates.Player = 				'<div class="player">Use currently playing:<span class="track"></span></div>'
 
 Templates.EditNavigation = 		'<div class="pagination">' +
 									'<div class="left">' +
@@ -76,12 +76,12 @@ Templates.SearchMusic = 		'<div id="search" id="music">' +
 									'</form>' +
 								'</div>';
 
-Templates.ProfileHeader = 		'<div class="picture"></div>' +
+Templates.ProfileHeader = 		'<div class="picture" style="background-size: 100% 100%; background-image: url(<%= image %>);"></div>' +
 								'<div class="information">' +
 									'<div class="name"><%= fullname %></div>' +
 									'<div class="statistics">' +
-										'<p id="location"><span class="mp-marker"></span><%= location %></p>' +
-										'<p id="memories"><span class="mp-disc"></span>9 memories</p>' +
+										'<% if(typeof location != "undefined") { %><p id="location"><span class="mp-marker"></span><%= location %></p><% } %>' +
+										'<% if(pins != 0) { %><p id="memories"><span class="mp-disc"></span><%= pins %> pin<% if(pins > 1) { print("s"); } %></p><% } %>' +
 									'</div>' +
 								'</div>';
 
@@ -90,18 +90,37 @@ Templates.Profile = 			'<div id="top"></div>' +
 									'<div id="sidebar"></div>' +
 								'</div>';
 
-Templates.EmptyActivityModule = '<p>Your memory map<br/>is currently empty.</p>' +
-								'<button id="goto-pin" class="sp-button">Add pin</button>';
+Templates.EmptyPins = 			'<div class="alert">' +
+									'<span class="mp-pin"></span>' +
+									'<p class="header">No pins</p>' +
+									'<% if(isLoggedInUser) { %>' +
+										'<p>Click the Pin button to add<br/>a pin to your profile</p>' +
+									'<% } %>' +
+								'</div>';
 
-Templates.Login = 				'<h2>Please Log In with Facebook to Continue</h2>' +
-								'<span class="mp-login">Log In</span>';
+Templates.Login = 				'<button class="sp-facebook mp-login"><span class="facebook"></span>Log in with Facebook</button>';
 
 Templates.Activity = 			'<li>' +
 									'<div class="music"><span></span><b><%= title %></b> by <%= artists %></div>' +
 									'<div class="location"><%= location %></div>' +
+								'</li>'; 
+
+Templates.Friend = 				'<li style="display:<%= display %>">' +
+									'<div class="picture">' +
+										'<div style="background-image: url(<%= picture %>);"></div>' +
+									'</div>' +
+									'<% if(active){ %><a><% } %><span><%= name %></span><% if(active){ %></a><% } %>' +
 								'</li>';
 
-Templates.Friend = '<li style="display:<%= display %>"><div class="picture"><img src="<%= picture %>" alt="<%= name %>\'s profile picture"/><button class="sp-button">Send Invitation</button></div><a><span><%= name %></span></a></li>';
-Templates.Friends = '<div><form id="filter"><input type="text" value="Filter"/></form><ul class="friendslist"></ul></div>';
+Templates.Friends = 			'<div>' +
+									'<form id="filter">' +
+										'<input type="text" value="Filter"/>' +
+									'</form>' +
+									'<ul class="friendslist"></ul>' +
+									'<div id="page-bottom">' +
+										'<button class="sp-facebook mp-invite"><span class="friends"></span>Invite Friends</a>' +
+									'</div>' +
+								'</div>';
+
 Templates.TrackResults = '<div class="title" id="tracks">Tracks</div><ul></ul>';
 Templates.Result = '<li><img src="<%= trackimage %>"><p><span><%= trackname %></span> by <%= trackartists %></p></li>';

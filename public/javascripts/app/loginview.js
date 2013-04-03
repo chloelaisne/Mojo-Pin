@@ -1,7 +1,7 @@
 App.LoginView = Backbone.View.extend({
 
 	events: {
-		"click .mp-login": "authDialog"
+		"click button.mp-login": "authDialog"
 	},
 
 	initialize: function()
@@ -19,6 +19,10 @@ App.LoginView = Backbone.View.extend({
 	{
 		this.$el.html(Templates.Login);
 		this.setElement(this.el);
+
+		// Vertically center Login button
+		$("button.sp-facebook").css({"margin-top": ($("body").outerHeight() / 2) - ($("button.sp-facebook").outerHeight() / 2) + "px"});
+
 		return this;
 	}
 

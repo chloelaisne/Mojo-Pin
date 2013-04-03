@@ -7,7 +7,6 @@ App.InformationWindowView.prototype = _.extend(Backbone.View.prototype, google.m
 		_.bindAll(this, 'onAdd', 'draw', 'onRemove');
 
 		this.model = model;
-		console.log(model);
 	},
 
 	onAdd: function()

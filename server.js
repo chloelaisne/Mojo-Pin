@@ -68,6 +68,23 @@ app.get('*', function (request, response, next){
   });
 });
 
+// Return Facebook friends that sign up to the App
+app.post('/json/friends', function (request, response) {
+  var query = "SELECT `facebook_id` FROM  `" + database + "`.`mp_users` WHERE  `mp_users`.`facebook_id` IN (" + request.body.data + ")";
+  connection.query(query, function (error, results, fields){
+    if(error) throw error;
+    
+    response.writeHead(200, {'Content-Type': 'application/json'});
+    response.write(JSON.stringify(results), 'utf-8');
+    response.end('\n');
+  });
+
+
+  
+});
+
+
+
 /* ==================================================
    ==================== SESSION
    ================================================== */
@@ -122,17 +139,31 @@ app.post('/json/login', function (request, response) {
             request.session.token       = data.access_token;
             request.session.expires     = data.expires;
 
-            // Return user session
-            var session = JSON.stringify({
-              user_id       : request.session.facebookid,
-              access_token  : request.session.token,
-              expires_at    : request.session.expires
+            var params = { access_token: data.access_token };
+
+            // Get user location
+            FB.api('me', params, function (data){
+
+              request.session.location = data.location.name;
+
+              // Return user session
+              var session = JSON.stringify({
+                user_id       : request.session.facebookid,
+                access_token  : request.session.token,
+                expires_at    : request.session.expires,
+                user_location : request.session.location
+              });
+
+              response.writeHead(200, {'Content-Type': 'application/json'});
+              response.write(session, 'utf-8');
+              response.end();
+
             });
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(session, 'utf-8');
-            response.end();
+
           });
+
         });
+
       }
       // ===== If Facebook User ID does not exist ===== //
       else {
@@ -154,18 +185,28 @@ app.post('/json/login', function (request, response) {
           connection.query(query, params, function (error, results, fields){
             if(error) throw error;
 
-            // Return user session
-            var session = JSON.stringify({
-              user_id       : request.session.facebookid,
-              access_token  : request.session.token,
-              expires_at    : request.session.expires
+            // Get user location
+            FB.api('me', params, function (data){
+
+              request.session.location = data.location.name;
+
+              // Return user session
+              var session = JSON.stringify({
+                user_id       : request.session.facebookid,
+                access_token  : request.session.token,
+                expires_at    : request.session.expires,
+                user_location : request.session.location
+              });
+
+              response.writeHead(200, {'Content-Type': 'application/json'});
+              response.write(session, 'utf-8');
+              response.end();
             });
-            response.writeHead(200, {'Content-Type': 'application/json'});
-            response.write(session, 'utf-8');
-            response.end();
+
           });
 
         });
+
       }
 
     });
@@ -186,15 +227,36 @@ app.post('/json/session/user', function (request, response) {
   }
   // ===== If user session exists ===== //
   else {
-    // Return user session
-    var session = JSON.stringify({
-      user_id       : request.session.facebookid,
-      access_token  : request.session.token,
-      expires_at    : request.session.expires
+    // Verify if access token is not invalid or expired
+    var http = '/debug_token';
+    var params = { input_token: request.session.token, access_token: APP_TOKEN };
+
+    FB.api(http, params, function (json){
+      // ***** If Access Token is not valid ***** //
+      if(json.data.is_valid == false)
+      {
+        /***** CLIENT SIDE - Open Facebook Authentification Dialog *****/
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.write(JSON.stringify({ action: 'authenticateWithFacebook' }), 'utf-8');
+        response.end();
+      }
+      // ***** If Access Token is valid ***** //
+      else
+      {
+        console.log(request.session);
+        var session = JSON.stringify({
+          user_id       : request.session.facebookid,
+          access_token  : request.session.token,
+          expires_at    : request.session.expires,
+          user_location : request.session.location
+        });
+
+        // Return user session
+        response.writeHead(200, {'Content-Type': 'application/json'});
+        response.write(session, 'utf-8');
+        response.end();
+      }
     });
-    response.writeHead(200, {'Content-Type': 'application/json'});
-    response.write(session, 'utf-8');
-    response.end();
   }
 
 });
@@ -275,7 +337,6 @@ app.get('/json/pins/:user', function (request, response){
   var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
   connection.query(query, function (error, results, fields){
     if(error) throw error;
-    console.log(results);
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');
@@ -287,7 +348,6 @@ app.get('/json/pins', function (request, response){
   var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
-    console.log(results);
     response.writeHead(200, {'Content-Type': 'application/json'});
     response.write(JSON.stringify(results), 'utf-8');
     response.end('\n');

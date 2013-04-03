@@ -1,5 +1,10 @@
 App.EditLocationView = Backbone.View.extend({
 	
+	attributes:
+	{
+		id: "location"
+	},
+
 	initialize: function()
 	{
 		_.bindAll(this, 'setLocation', 'renderSearchModule', 'renderMapModule', 'render');
@@ -9,6 +14,7 @@ App.EditLocationView = Backbone.View.extend({
 		if(typeof this.model == "undefined" || this.model.get("reference") == null)
 		{
 			this.model = new App.Location();
+			this.mapModuleView.setCenter(App.FACEBOOK['user_location']['latitude'], App.FACEBOOK['user_location']['longitude']);
 		}
 		else
 		{

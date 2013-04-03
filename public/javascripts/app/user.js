@@ -1,35 +1,29 @@
 App.User = Backbone.Model.extend({
 
-	defaults: {
-		fullname	: 'Undefined',
-		location	: 'Undefined'
-	},
-
 	initialize: function()
-	{
-		_.bindAll(this, 'initializeData');
-
-		App.Events.on("changeAccessToken", this.initializeData);
-	},
-
-	initializeData: function(access_token)
 	{
 		var self = this;
 
 		// Get name and location of the user
 		$.ajax({
 			type	: "GET",
-			url		: "https://graph.facebook.com/me?access_token=" + access_token,
+			url		: "https://graph.facebook.com/" + this.get("facebook_id") + "?access_token=" + App.FACEBOOK["access_token"],
 			dataType: "json"
 		})
 		.done(function (data, textStatus, jqXHR){
-			
-			self.set({
-				fullname	: data.first_name + " " + data.last_name,
-				location	: data.location.name
-			});
+
+			// Verify if Facebook friend gave read access to Current City
+			if(typeof data.location != 'undefined')
+				self.set({ location: data.location.name });
+
+			self.set({ first_name: data.first_name, last_name: data.last_name });
 
 		});
+	},
+
+	initializeData: function(model)
+	{
+
 
 		
 	}

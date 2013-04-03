@@ -1,17 +1,24 @@
 // Declare namespace
 window.App = {
 
-	OFFLINE: 2,
+	// Facebook credentials
+	FACEBOOK: new Array(),
 
-	ONLINE: 1,
-
-	GOOGLE_MAPS: {
-		API_KEY	: 'AIzaSyCSTzcjJfXnNFlnhe6x9hBzxCo5AxTOk88', // AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ
-		SENSOR	: false
-	},
+	// Google Maps credentials
+	GOOGLE_MAPS: new Array(),
 
 	initialize: function()
 	{
+
+		// Set Facebook Credentials
+		this.FACEBOOK["app_identifier"]	= "476683619043995";
+		this.FACEBOOK["app_permissions"]	= ['user_location','friends_location', 'publish_actions'];
+
+		// Set Google Maps Credentials
+		// this.GOOGLE_MAPS["key"] = "AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ";
+		this.GOOGLE_MAPS["key"] = "AIzaSyCSTzcjJfXnNFlnhe6x9hBzxCo5AxTOk88";
+		this.GOOGLE_MAPS["sensor"] = false;
+
 		var self = this;
 
 		// Verify if user session exists
@@ -26,12 +33,7 @@ window.App = {
 			}
 			// If user session does exist, return user session
 			else {
-				self.FACEBOOK 				= {};
-				self.FACEBOOK.ACCESS_TOKEN 	= data.access_token;
-				self.FACEBOOK.EXPIRES_AT 	= data.expires_at;
-				self.FACEBOOK.USER_ID 		= data.user_id;
-
-				App.Events.trigger("changeAccessToken", self.FACEBOOK.ACCESS_TOKEN);
+				App.Events.trigger("FacebookCredentialsGet", data);
 			}
 		});
 	},

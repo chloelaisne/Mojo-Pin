@@ -9,14 +9,12 @@ App.EditView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setClassname', 'setRoute', 'renderRoute', 'getSession', 'setSession', 'delSession', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
+		_.bindAll(this, 'setRoute', 'renderRoute', 'getSession', 'setSession', 'delSession', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
 
 		this.view 					= null;
 		this.editNavigation 		= new App.EditNavigationView();
-		this.views.editDescription 	= new App.EditDescriptionView({ model: this.model });
 
 		this.model 							= new App.Pin();
-		this.model.bind("change:classname"	, this.setClassname);
 
 		App.Events.on("setSession"			, this.setSession);
 		App.Events.on("delSession"			, this.delSession);
@@ -25,6 +23,10 @@ App.EditView = Backbone.View.extend({
 		App.Events.on("changeLocation"		, this.setLocationModel);
 		App.Events.on("changeDescription"	, this.setDescriptionModel);
 		App.Events.on("changeRoute"			, this.setRoute);
+
+		this.getSession();
+
+		
 	},
 
 	setRoute: function(route)
@@ -38,7 +40,10 @@ App.EditView = Backbone.View.extend({
 
 	render: function()
 	{
-		this.getSession();
+		// If session data fetched and object initialized
+		if(typeof this.views.editMusic != 'undefined' || typeof this.views.editLocation != 'undefined' || typeof this.views.editDescription != 'undefined' )
+			this.renderRoute();
+
 		return this;
 	},
 
@@ -101,11 +106,18 @@ App.EditView = Backbone.View.extend({
 	{
 		if(typeof uri != 'undefined')
 		{
+			// If Music model set from outside the view e.g. LINKSCHANGED event
+			if(Backbone.history.fragment != "edit") {
+				App.router.navigate("/edit", true);
+				this.renderEditMusic();
+			}
+
 			this.model.set({ "music_uri": uri });
 			this.editNavigation.model.set({ music: true });
 		}
 		else
 		{
+			
 			this.model.unset("music_uri");
 			this.editNavigation.model.set({ music: false });
 		}
@@ -113,6 +125,7 @@ App.EditView = Backbone.View.extend({
 
 	renderEditMusic: function()
 	{
+		console.log("renderEditMusic");
 		$(this.el).html((this.views.editMusic.render()).el);
 	},
 
@@ -124,31 +137,42 @@ App.EditView = Backbone.View.extend({
 	{
 		var self = this;
 
+		console.log("getSession 1");
+
 		$.ajax({
 			url 	: 'http://localhost:3000/json/session/pin',
 			type 	: 'GET'
 		})
-		.done(function (cookie, textStatus, jqXHR){
-			self.model.set({ route: "music" });
+		.done(function (data, textStatus, jqXHR){
 
-			// Initialize Music view with Model data or Session data
-			if(typeof cookie.music != 'undefined'  && cookie.music != null){
-				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
-				self.model.set({ route: "location" });
-			}
-			else if(typeof self.views.editMusic == 'undefined'){
+			var cookie = data.cookie;
+
+			if((typeof cookie.music == 'undefined' || cookie.music == null) && (typeof cookie.location == 'undefined' || cookie.location == null))
+			{
 				self.views.editMusic = new App.EditMusicView();
-			}
-
-			// Initialize Location view with Session data
-			if(typeof cookie.location != 'undefined'  && cookie.location != null){
-				self.views.editLocation = new App.EditLocationView({ model: new App.Location({ reference: cookie.location }) });
-				self.model.set({ route: "description" });
-			}
-			else if(typeof self.views.editLocation == 'undefined'){
 				self.views.editLocation = new App.EditLocationView();
+				self.views.editDescription 	= new App.EditDescriptionView();
+				self.model.set({ route: "music" });
+				console.log("getSession music");
+			}
+			else if((typeof cookie.music != 'undefined' && cookie.music != null) && (typeof cookie.location == 'undefined' || cookie.location == null))
+			{
+				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
+				self.views.editLocation = new App.EditLocationView();
+				self.views.editDescription 	= new App.EditDescriptionView();
+				self.model.set({ route: "location" });
+				console.log("getSession location");
+			}
+			else if((typeof cookie.music != 'undefined' && cookie.music != null) && (typeof cookie.location != 'undefined' && cookie.location != null))
+			{
+				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
+				self.views.editLocation = new App.EditLocationView({ model: new App.Location({ reference: cookie.location }) });
+				self.views.editDescription 	= new App.EditDescriptionView();
+				self.model.set({ route: "description" });
+				console.log("getSession description");
 			}
 
+			console.log("getSession 2");
 			// Render view
 			self.renderRoute();
 
@@ -156,34 +180,25 @@ App.EditView = Backbone.View.extend({
 		.fail(function (jqXHR, textStatus, errorThrown){ console.log("getSession fail"); });
 	},
 
-	setClassname: function()
-	{
-		$('body').removeClass().addClass(this.model.get("classname"));
-	},
-
 	renderRoute: function()
 	{
+		
 		switch(this.model.get("route"))
 		{
 			case "description":
-				console.log("renderRoute Description");
-				this.model.set({ "classname": "description"});
 				this.renderEditDescription();
 				this.editNavigation.setDescriptionNavigationState();
 				break;
 			case "location":
-				console.log("renderRoute Description");
-				this.model.set({ "classname": "location"});
 				this.renderEditLocation();
 				this.editNavigation.setLocationNavigationState();
 				break;
 			case "music":
-				this.model.set({ "classname": "music"});
+			default:
 				this.renderEditMusic();
 				this.editNavigation.setMusicNavigationState();
 				break;
 		}
-		this.editNavigation.render();
 	},
 
  /* ==================================================
@@ -201,9 +216,7 @@ App.EditView = Backbone.View.extend({
 			url 	: 'http://localhost:3000/json/session/pin',
 			type 	: 'POST',
 			data 	: object
-		})
-		.done(function (data, textStatus, jqXHR){ console.log("setSession done"); })
-		.fail(function (jqXHR, textStatus, errorThrown){ console.log("setSession fail"); });
+		});
 	},
 
  /* ==================================================

@@ -4,22 +4,54 @@
  *
  */
 
-
-
-.mp-login {
-	display: block;
-	width: 177px;
-	height: 25px;
-	margin: 0 auto;
-	text-indent: -700px;
-	overflow: hidden;
-	font-weight: bold;
-	background: transparent url(../images/facebook_login.png) no-repeat left top;
-	color: #fff;
-	font-family: "Lucida Grande", "Tahoma", "Arial", sans-serif;
+.alert {
+	margin-top: -20px;
+	position: relative;
 }
 
+.alert .mp-pin {
+	width: 56px;
+	height: 56px;
+	display: block;
+	margin: 0 auto 15px auto;
+	background: transparent url(../images/pin_icon.png) no-repeat center center;
+}
 
+.alert p {
+	font-size: 11px;
+	color: #e5e3df;
+	text-align: center;
+}
+
+.alert p.header {
+	font-size: 12px;
+	margin-bottom: 6px;
+	font-weight: bold;
+}
+
+.logout {
+	float: left;
+	background: transparent url(../images/logout_icon.png) no-repeat 0 0;
+	display: block;
+	width: 14px;
+	height: 14px;
+	position: relative;
+	top:5px;
+	margin-right: 6px;
+}
+
+#goto-logout:active .logout {
+	background-position: 0 -14px;
+}
+
+#goto-logout {
+	position: absolute;
+	right: 0;
+}
+
+#goto-logout:active {
+	color: #dcdcdc;
+}
 
 html, body {
 	height: 100%;
@@ -79,7 +111,7 @@ h2 {
 	text-align: center;
 }
 
-body.music h2 {
+#music h2 {
 	margin: 80px 0 75px 0;
 }
 
@@ -463,18 +495,6 @@ nav ul li.active {
 	z-index: 10;
 }
 
-#sidebar p {
-	color: #c6c6c6;
-	text-align: center;
-	font-size: 11px;
-	margin-bottom: 15px;
-	margin-top: 150px;
-}
-
-#sidebar button {
-	position: relative;
-}
-
 #sidebar ul li {
 	border-top: 1px solid #505050;
 	border-bottom: 1px solid #383838;
@@ -684,16 +704,74 @@ nav ul li.active {
 	width: 100%;
 	position: fixed;
 	top: 52px;
-	right: 14px;
+	right: 15px;
 	background-color: rgba(55,55,55,0.9);
 	height: 32px;
 	z-index: 100;
+}
+
+
+body.friends #page-bottom {
+	background-color: rgba(55,55,55,0.9);
+	height: 28px;
+	padding-top: 4px;
+	text-align: center;
+	right: 15px;
+}
+
+.sp-facebook {
+	background: -webkit-linear-gradient(top, #637bad 0%, #5972a7 100%);
+	background-size: auto;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #29447e #29447e #1a356e #29447e;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 11px;
+	font-weight: bold;
+	line-height: 13px;
+	padding: 3px 6px 4px 6px;
+	text-align: center;
+	text-decoration: none;
+	vertical-align: top;
+	white-space: nowrap;
+	font-family: "Lucida Grande", "Tahoma", "Arial", sans-serif;
+	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2);
+}
+
+body.friends .sp-facebook {
+	margin-left: 30px;
+}
+
+span.facebook {
+	width:9px;
+	height:11px;
+	float: left;
+	margin-right: 5px;
+	margin-top: 2px;
+	background: transparent url(../images/facebook_icon.png) no-repeat left top;
+}
+
+span.friends {
+	width:14px;
+	height:13px;
+	float: left;
+	margin-right: 5px;
+	background: transparent url(../images/friends_icon.png) no-repeat left top;
+}
+
+.sp-facebook:active {
+	background: #4f6aa3;
+	border-bottom-color: #29447e;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .2);
 }
 
 #filter input {
 	float: right;
 	width: 137px;
 	height: 16px;
+	line-height: 16px;
 	border: 1px solid #111111;
 	background-color: #;
 	border-radius: 32px;
@@ -721,10 +799,6 @@ nav ul li.active {
 	cursor: default;
 }
 
-.picture:hover {
-	cursor: pointer;
-}
-
 .picture button{
 	position: absolute;
 	bottom: 7px;
@@ -733,19 +807,22 @@ nav ul li.active {
 }
 
 .picture button:hover{
-	cursor: default;
+	cursor: pointer;
 }
 
-.friendslist img {
+.friendslist .picture div {
 	display: block;
 	width: 130px;
 	height: 130px;
 	overflow: hidden;
 	border-radius: 2px;
-	box-shadow: 0 0 4px rgba(0,0,0,0.5);
+	background-color: transparent;
+	background-size: 100% 100%;
+	background-position: center center;
+	box-shadow: 0 0 4px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.5) inset;
 }
 
-.friendslist a {
+.friendslist span {
 	display: block;
 	width: 130px;
 	height: 34px;
@@ -758,13 +835,13 @@ nav ul li.active {
 	text-decoration: none;
 }
 
-.friendslist span {
+.friendslist a {
 	text-decoration: none;
 	cursor: default;
 	display:inline;
 }
 
-.friendslist span:hover {
+.friendslist a:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -783,11 +860,11 @@ nav ul li.active {
 
 
 
-.location #search {
+#location #search {
 	position: relative;
 }
 
-.location #results {
+#location #results {
 	width: 333px;
 	background: #ffffff;
 	margin: 0 0 0 -166px;
@@ -800,20 +877,20 @@ nav ul li.active {
 	box-shadow: 0 -5px 10px rgba(0,0,0,.5);
 }
 
-.location #results ul {
+#location #results ul {
 	width: 100%;
 	overflow: hidden;
 	margin: 8px 0;
 }
 
 
-.location #results li {
+#location #results li {
 	height: 28px;
 	line-height: 28px;
 	padding: 0 16px;
 }
 
-.location #results li.active {
+#location #results li.active {
 	background: -webkit-linear-gradient(top, #afdff8 0%, #97d3f6 100%);
 	box-shadow: 0 1px 0 #bae4fa inset;
 }
@@ -857,32 +934,17 @@ form input:focus {
 }
 
 .player .track {
-	color: #f6f0ad;`
+	color: #f6f0ad;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
-}
-
-.player .track:hover,
-.player .volume:hover {
-	color: #5ea9d4;
-}
-
-.player .volume {
-	width: 12px;
-	height: 12px;
-	display: inline-block;
+	padding-left: 32px;
+	background: transparent url(../images/sound_icons.png) no-repeat 10px 1px;
 	overflow: hidden;
-	padding: 0 10px 0 0;
-	margin: 0 0 0 10px;
-	position: relative;
-	top: 2px;
 }
 
-.volume.on {
-	background: transparent url(../images/sound_icons.png) no-repeat 0 0;
-}
-
-.volume.off{
-	background: transparent url(../images/sound_icons.png) no-repeat 0 -12px;
+.player .track:hover {
+	background-position: 10px -11px;
+	color: #5ea9d4;
+	cursor: pointer;
 }
 
 #dropzone {
@@ -948,12 +1010,12 @@ form input:focus {
 	padding: 0;
 }
 
-.location .search {
+#location .search {
 	position: relative;
 	top: 18px;
 }
 
-.location #search form {
+#location #search form {
 	width: 435px;
 }
 
@@ -1024,11 +1086,13 @@ form input:focus {
 	color: #424242;
 }
 
-
-#page-bottom {
+body #page-bottom {
 	position: fixed;
 	bottom: 0;
 	width: 100%;
+}
+
+#description #page-bottom, #location #page-bottom {
 	height: 57px;
 	border-top: 1px solid #ffffff;
 	padding: 8px 0;
@@ -1039,7 +1103,7 @@ form input:focus {
 	margin: 0 auto;
 }
 
-body.description #page-bottom {
+#description #page-bottom {
 	height: 132px;
 	padding: 10px 0 12px 0;
 }
@@ -1106,7 +1170,7 @@ nav ul li.mp-icon {
 	z-index: 100;
 }
 
-.location .pagination .right {
+#location .pagination .right {
 	color: #636363;
 	text-shadow: 0 1px 0 rgba(255,255,255,1);
 }
@@ -1115,7 +1179,7 @@ nav ul li.mp-icon {
 	font-weight: bold;
 }
 
-.location .pagination .right button {
+#location .pagination .right button {
 	margin-right: 5px;
 }
 

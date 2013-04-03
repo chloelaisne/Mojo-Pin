@@ -1,5 +1,10 @@
 App.EditDescriptionView = Backbone.View.extend({
 	
+	attributes:
+	{
+		id: "description"
+	},
+
 	initialize: function()
 	{
 		_.bindAll(this, 'renderDescriptionModule', 'renderMapModule', 'render')

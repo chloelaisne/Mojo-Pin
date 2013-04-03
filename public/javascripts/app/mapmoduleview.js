@@ -1,5 +1,7 @@
 App.MapModuleView = Backbone.View.extend({
 
+	className: "map",
+
 	// Array of all markers on the map
 	markers: [],
 
@@ -53,8 +55,6 @@ App.MapModuleView = Backbone.View.extend({
 	addMarker: function(model)
 	{
 		var self = this;
-
-		console.log(model);
 
 		// Create marker instance
 		var position = new google.maps.LatLng(model.get("latitude_location"), model.get("longitude_location"));
@@ -163,6 +163,7 @@ App.MapModuleView = Backbone.View.extend({
 
 	render: function()
 	{
+		
 		$(this.el).css({
 			width: $("body").width() - $("#sidebar").outerWidth(),
 			height: $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight()

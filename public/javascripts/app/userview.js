@@ -2,60 +2,54 @@ App.UserView = Backbone.View.extend({
 
 	initialize: function()
 	{
-		console.log('yol4o');
-		_.bindAll(this, 'renderInformation', 'renderPins', 'loadCollection', 'setMapFocus', 'userDataLoaded', 'mapDataLoaded', 'render');
+		_.bindAll(this, 'setMapCenter', 'renderProfile', 'renderPins', 'renderMap', 'render');
 
-		this.mapModuleView = new App.MapModuleView({ id: "map_profile" });
+		this.model.bind("change:first_name", this.renderProfile);
 
 		// Initialize the collection of pins
 		this.pins = new Backbone.Collection();
-		this.pins.bind('reset', this.renderPins)
-
-		this.user = new App.User();
-		this.user.bind("change", this.userDataLoaded);
-
-		App.Events.on("changeAccessToken", this.loadCollection);
-	},
-
-	loadCollection: function()
-	{
-		this.pins.url = 'http://localhost:3000/json/pins/'+ App.FACEBOOK.USER_ID;
+		this.pins.url = 'http://localhost:3000/json/pins/'+ this.model.get("facebook_id");
+		this.pins.bind('reset', this.renderPins);
+		// Load collection
 		this.pins.fetch();
+
+		this.mapModuleView = new App.MapModuleView({ id: "map_profile" });
+
+		this.location = new App.Location();
+		// Get Google Maps details from the Search Query API
+		this.location.on("change:address", this.location.setLocationDetails);
+		this.location.on("change:latitude", this.setMapCenter);
 	},
 
-	setMapFocus: function(model)
+	renderMap: function()
 	{
-		// Set map center
-		this.mapModuleView.setCenter(model.get("latitude_location"), model.get("longitude_location"));
+		// Set Map center to default location: Stockholm, Sweden
+		this.setMapCenter();
+
+		this.$("#middle").append((this.mapModuleView.render()).el);
 	},
 
-	userDataLoaded: function()
+	setMapCenter: function()
 	{
-		// Get location details from the Google Maps Places API
-		this.location = new App.Location({ address: this.user.get("location") });
-		this.location.bind("change", this.mapDataLoaded);
-		// Re-render view
-		this.renderInformation();
-
-		// Render profile picture
-		this.$("div.picture").css({ "background-image": "url(https://graph.facebook.com/me/picture?width=130&height=130&access_token=" + App.FACEBOOK.ACCESS_TOKEN + ")" });
-	},
-
-	mapDataLoaded: function()
-	{
-		// Set map center
+		// Set Map center
 		this.mapModuleView.setCenter(this.location.get("latitude"), this.location.get("longitude"));
 	},
 
-	renderInformation: function()
+	renderProfile: function()
 	{
-		if(typeof this.user.get("fullname") != undefined){
-			this.informationTemplateSettings = {
-				fullname	: this.user.get("fullname"),
-				location	: this.user.get("location")
+		if(typeof this.model.get("first_name") != 'undefined')
+		{
+			this.location.set({ "address": this.model.get("location") });
+
+			var templateSettings = {
+				fullname	: this.model.get("first_name") + " " + this.model.get("last_name"),
+				location	: this.model.get("location"),
+				pins 		: this.pins.length,
+				image 		: "https://graph.facebook.com/" + this.model.get("facebook_id") + "/picture?width=130&height=130&access_token=" + App.FACEBOOK["access_token"]
 			};
 
-			this.$("#top").html(_.template(Templates.ProfileHeader)(this.informationTemplateSettings));
+			this.$("#top").html(_.template(Templates.ProfileHeader)(templateSettings));
+			console.log('render map', this.$("#top").outerHeight());
 		}
 	},
 
@@ -67,8 +61,23 @@ App.UserView = Backbone.View.extend({
 		// ===== If pin collection is empty ===== //
 		if(this.pins.length == 0)
 		{
-			this.$("#sidebar").html(Templates.EmptyActivityModule);
-			this.$("#sidebar button").css({ "left": this.$("#sidebar").outerWidth() / 2 - this.$("#sidebar button").outerWidth() / 2 + "px" });
+			var isLoggedInUser;
+
+			// Logged in user
+			if(App.FACEBOOK["user_id"] == this.model.get("facebook_id")) {
+				isLoggedInUser = true;
+			}
+			// Logged in user's friends
+			else {
+				isLoggedInUser = false;
+			}
+
+
+			var templateSettings = { "isLoggedInUser": isLoggedInUser };
+
+			this.$("#sidebar").html(_.template(Templates.EmptyPins)(templateSettings));
+
+			this.resizeView();
 		}
 		// ===== If pin collection is not empty ===== //
 		else {
@@ -76,7 +85,7 @@ App.UserView = Backbone.View.extend({
 
 			// Reset markers array
 			this.mapModuleView.markers = [];
-			
+
 			_(this.pins.models).each(function(activity)
 			{
 				// Append row of pin-related information to the sidebar
@@ -91,14 +100,20 @@ App.UserView = Backbone.View.extend({
 		}
 	},
 
+	resizeView: function()
+	{
+		// Resize Map
+		this.$(".map").css("height", $(window).height() - (this.$("#top").height() + this.$("#top").offset().top) + "px");
+
+		// Vertically center the DOM element
+		this.$("#sidebar .alert").css("top", (this.$("#sidebar").outerHeight() / 2) - (this.$("#sidebar .alert").outerHeight() / 2) + "px");
+	},
+
 	render: function()
 	{
 		this.$el.html(Templates.Profile);
 
-		this.$("#middle").append((this.mapModuleView.render()).el);
-
-		this.renderInformation();
-		this.renderPins();
+		this.renderMap();
 
 		this.setElement($(this.el));
 		return this;

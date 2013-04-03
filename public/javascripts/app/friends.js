@@ -1,4 +1,9 @@
-App.FriendsCollection = Backbone.Collection.extend({
+App.Friends = Backbone.Collection.extend({
+
+	initialize: function()
+	{
+		_.bindAll(this, 'filter', 'getIDs', 'sortByAlphabeticalOrder');
+	},
 
 	parse: function(response)
 	{
@@ -10,22 +15,23 @@ App.FriendsCollection = Backbone.Collection.extend({
 		return model.get('name');
 	},
 
-	filter: function(string)
+	sortByAlphabeticalOrder: function()
 	{
-		var pattern = new RegExp("\s*\w*" + string + "\s*\w*", "ig");
 
-		var models = _.filter(this.models, function(model)
-		{
-			// Hide friends not matching the input from the filtering
-			if(pattern.test(model.get("name")) == true)
-				model.set({ display: "block" });
-			else
-				model.set({ display: "none" });
-			
-			return model;
+	},
+
+	getIDs: function()
+	{
+		var ids = "";
+
+		_.filter(this.models, function(model){
+			ids += model.get("id") + ",";
 		});
 
-		this.models = models;
+		// Remove last coma from string
+		ids = ids.slice(0, -1)
+
+		return ids;
 	}
 
 });
