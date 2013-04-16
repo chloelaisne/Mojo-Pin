@@ -16,13 +16,16 @@ App.Music = Backbone.Model.extend({
 
 		if(typeof this.get("uri") != 'undefined' || this.get("uri") != null)
 		{
-			this.spotifyModel = Spotify.Models.Track.fromURI(this.get("uri"), function (data)
+			var modeltrack = Spotify.Models.Track.fromURI(this.get("uri"), function (track)
 			{
-				self.set
-				({
-					name	: data.name,
-					artists	: data.artists.join(", "),
-					image	: data.image
+				var name 		= track.name;
+				var artists 	= track.artists.join(", ");
+
+				var modelAlbum = Spotify.Models.Album.fromURI(track.album.uri, function(album)
+				{
+					var cover 	= album.image;
+					self.set({ track: name, artists: artists, image: cover });
+					App.Events.trigger("changeMusic", self);
 				});
 			});
 		}

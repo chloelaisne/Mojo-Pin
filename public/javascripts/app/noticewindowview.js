@@ -1,18 +1,12 @@
-App.NoticeWindowView = Backbone.View.extend({
+App.NoticeWindowView = Backbone.View.extend();
 
-	model: App.NoticeWindow,
+App.NoticeWindowView.prototype = _.extend(Backbone.View.prototype, google.maps.OverlayView.prototype,{
 
-	initialize: function()
+	initialize: function(model)
 	{
-	}
-	
-});
-
-_.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.OverlayView.prototype,{
-
-	initialize: function(options)
-	{
-		this.setMap(this.options.map.map);
+		_.bindAll(this, 'onAdd', 'draw', 'onRemove');
+		
+		this.model = model.data;
 	},
 
 	onAdd: function()
@@ -22,11 +16,11 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 
 		this.music = document.createElement('div');
 		this.music.className = "music";
-		this.music.innerHTML = '<span class="mp-track"></span><span>' + this.options.title + '</span> by ' + this.options.artists;
+		this.music.innerHTML = '<span class="mp-track"></span><span class="track">' + this.model.get("music_track") + '</span> by <span class="artists">' + this.model.get("music_artists") + '</span>';
 
 		this.location = document.createElement('div');
 		this.location.className = "location";
-		this.location.innerHTML = '<span class="mp-location"></span>' + this.options.location;
+		this.location.innerHTML = '<span class="mp-location"></span>' + this.model.get("location_description");
 
 		div.appendChild(this.music);
 		div.appendChild(this.location);
@@ -76,22 +70,16 @@ _.extend(App.NoticeWindowView.prototype, Backbone.View.prototype, google.maps.Ov
 
 	draw: function()
 	{
-		/*var position = this.getProjection().fromLatLngToDivPixel(this.options.latlng);
-		this.div_.style.left = position.x - (this.width / 2) + "px";
-		this.div_.style.top = position.y - this.height - 34 - (this.arrowheight * 2) + "px";*/
-		this.position = this.getProjection().fromLatLngToDivPixel(this.options.latlng);
-		this.xMargin = (this.arrowwidth * 2);
+		var latlng = new google.maps.LatLng(this.model.get("location_latitude"), this.model.get("location_longitude"));
+		this.position = this.getProjection().fromLatLngToDivPixel(latlng);
 		this.yMargin = 45;
 
-		this.div_.style.left = this.position.x + this.xMargin + "px";
-		this.div_.style.top = this.position.y - this.yMargin + "px";
+		this.div_.style.left = this.position.x - (this.width / 2) + "px";
+		this.div_.style.top = this.position.y - this.height - this.yMargin + "px";
 	},
 
-	remove: function()
+	onRemove: function()
 	{
-		google.maps.event.removeListener(this.mousemoveListener);
-		google.maps.event.removeListener(this.clickListener);
-		google.maps.event.removeListener(this.dragendListener);
 		this.div_.parentNode.removeChild(this.div_);
 	}
 

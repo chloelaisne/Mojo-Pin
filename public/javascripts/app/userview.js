@@ -32,7 +32,7 @@ App.UserView = Backbone.View.extend({
 	setMapCenter: function()
 	{
 		// Set Map center
-		this.mapModuleView.setCenter(this.location.get("latitude"), this.location.get("longitude"));
+		this.mapModuleView.model.set({ latitude: this.location.get("latitude"), longitude: this.location.get("longitude") });
 	},
 
 	renderProfile: function()
@@ -104,8 +104,9 @@ App.UserView = Backbone.View.extend({
 	{
 		// Resize Map
 		this.$(".map").css("height", $(window).height() - (this.$("#top").height() + this.$("#top").offset().top) + "px");
-
-		// Vertically center the DOM element
+		// Resize Sidebar
+		this.$("#sidebar").css("height", $(window).height() - (this.$("#top").height() + this.$("#top").offset().top) + "px");
+		// Vertically center the alert DOM element
 		this.$("#sidebar .alert").css("top", (this.$("#sidebar").outerHeight() / 2) - (this.$("#sidebar .alert").outerHeight() / 2) + "px");
 	},
 
@@ -114,6 +115,13 @@ App.UserView = Backbone.View.extend({
 		this.$el.html(Templates.Profile);
 
 		this.renderMap();
+		// If Facebook credentials fetched, get user data
+		if(typeof App.FACEBOOK != "undefined")
+			this.renderPins();
+		// If Facebook credentials not fetched, wait for credentials to be fetched before getting user data
+		else
+			App.Events.on("FacebookCredentialsSet", this.renderPins)
+		
 
 		this.setElement($(this.el));
 		return this;

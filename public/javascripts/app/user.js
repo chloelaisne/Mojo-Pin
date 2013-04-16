@@ -2,6 +2,19 @@ App.User = Backbone.Model.extend({
 
 	initialize: function()
 	{
+		_.bindAll(this, 'getUserInformation');
+
+		// If Facebook credentials fetched, get user data
+		if(typeof App.FACEBOOK != "undefined")
+			this.getUserInformation();
+		// If Facebook credentials not fetched, wait for credentials to be fetched before getting user data
+		else
+			App.Events.on("FacebookCredentialsSet", this.getUserInformation)
+		
+	},
+
+	getUserInformation: function()
+	{
 		var self = this;
 
 		// Get name and location of the user
@@ -19,13 +32,6 @@ App.User = Backbone.Model.extend({
 			self.set({ first_name: data.first_name, last_name: data.last_name });
 
 		});
-	},
-
-	initializeData: function(model)
-	{
-
-
-		
 	}
 
 });

@@ -35,10 +35,7 @@ App.MasterView = Backbone.View.extend({
 			url		: 'http://localhost:3000/json/login',
 			data 	: { token: token }
 		})
-		.done(function (data, textStatus, jqXHR){
-			console.log(data);
-			self.setGlobals(data);
-		});
+		.done(function (data, textStatus, jqXHR){ self.setGlobals(data); });
 	},
 
 	setGlobals: function(data)
@@ -55,11 +52,8 @@ App.MasterView = Backbone.View.extend({
 			App.FACEBOOK['user_location']['latitude'] 	= latitude;
 			App.FACEBOOK['user_location']['longitude'] 	= longitude;
 
-			// Set all Facebook dependencies
+			// Trigger all Facebook dependencies
 			App.Events.trigger("FacebookCredentialsSet");
-
-			// Navigate to main route
-			App.router.navigate('/friends', true);
 		});
 	},
 

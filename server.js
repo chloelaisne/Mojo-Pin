@@ -243,7 +243,6 @@ app.post('/json/session/user', function (request, response) {
       // ***** If Access Token is valid ***** //
       else
       {
-        console.log(request.session);
         var session = JSON.stringify({
           user_id       : request.session.facebookid,
           access_token  : request.session.token,
@@ -264,46 +263,6 @@ app.post('/json/session/user', function (request, response) {
 /* ==============================
           Helper Functions
    ============================== */
-
-app.get('/json/session/pin', function (request, response) {
-  if(typeof request.session != 'undefined') {
-    response.writeHead(200, { 'Content-type': 'application/json' });
-    response.write(JSON.stringify(request.session), 'utf-8');
-    response.end('\n');
-  }
-});
-
-app.post('/json/session/pin', function (request, response) {
-  
-  if(request.body.music != 'undefined' && request.body.music != null)
-    request.session.music = request.body.music;
-  else if(request.body.location != 'undefined' && request.body.location != null)
-    request.session.location = request.body.location;
-  else if(request.body.description != 'undefined' && request.body.description != null)
-    request.session.description = request.body.description;
-
-  response.writeHead(200, { 'Content-type': 'application/json' });
-  response.end();
-});
-
-app.del('/json/session/pin', function (request, response) {
-  if(typeof request.body.music != 'undefined')
-  {
-    request.session.music = null;
-  }
-  else
-  {
-    if(request.session.music != 'undefined' && request.session.music != null)
-      request.session.music = null;
-    if(request.session.location != 'undefined' && request.session.location != null)
-      request.session.location = null;
-    if(request.session.description != 'undefined' && request.session.description != null)
-      request.session.description = null;
-  }
-  
-  response.writeHead(200, { 'Content-type': 'application/json' });
-  response.end();
-});
 
 // ===== USERS ===== //
 
@@ -334,7 +293,7 @@ app.get('/json/user/:user_id', function (request, response){
 
 // Return pin from user parameter - Facebook ID
 app.get('/json/pins/:user', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_pin` AND `mp_locations`.`id_location` = `mp_pins`.`location_pin` AND `mp_musics`.`id_music` = `mp_pins`.`music_pin`) WHERE `mp_users`.`facebook_id` = " + connection.escape(request.params.user);
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
@@ -345,7 +304,7 @@ app.get('/json/pins/:user', function (request, response){
 
 // Retrieve all pins
 app.get('/json/pins', function (request, response){
-  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_id` AND `mp_locations`.`id_location` = `mp_pins`.`location_id` AND `mp_musics`.`id_music` = `mp_pins`.`music_id`)";
+  var query = "SELECT * FROM `mp_pins` LEFT JOIN (`mp_users`, `mp_locations`, `mp_musics`) ON (`mp_users`.`facebook_id` = `mp_pins`.`user_pin` AND `mp_locations`.`id_location` = `mp_pins`.`location_pin` AND `mp_musics`.`id_music` = `mp_pins`.`music_pin`)";
   connection.query(query, function (error, results, fields){
     if(error) throw error;
     response.writeHead(200, {'Content-Type': 'application/json'});
@@ -367,61 +326,76 @@ app.get('/json/pin/:pin_id', function (request, response){
 
 // Create new pin
 app.post('/json/pin', function (request, response){
+  var id_location;
+  var latitude_location     = request.body.location_latitude;
+  var longitude_location    = request.body.location_longitude;
+  var reference_location    = request.body.location_reference;
+  var description_location  = request.body.location_description;
 
-  var location_id   = null;
-  var music_id      = null;
+  var id_music;
+  var uri_music             = request.body.music_uri;
+
+  var description_pin       = request.body.description;
+  var user_pin              = request.body.user;
+
+  console.log("user_pin: " + user_pin);  
+  console.log("request.body.user: " + request.body.user);
+
+  queryLocation();
 
   // Enter location in database: mp_locations
   // Or retrieve location identifier if location already exists
-  connection.query("SELECT * FROM `mp_locations` WHERE `reference_location` = '" + request.body.reference + "' LIMIT 0, 1", function (error, results){
-    if(error) throw error;
-    if(!results.length){
-      var parameters = [request.body.location_latitude, request.body.location_longitude, request.body.location_reference, request.body.location_description];
-      var query = "INSERT INTO `" + database + "`.`mp_locations`(`id_location`, `latitude_location`, `longitude_location`, `reference_location`, `description_location`) VALUES(NULL, ?, ?, ?, ?)";
-      connection.query(query, parameters, function (error, results){
-        if(error) throw error;
-        location_id = results.insertId;
-        console.log('Location entry inserted successfully in the database: ' + request.body.description);
-      });
-    } else{
-      console.log('Location entry already exists in the database: ' + request.body.latlng);
-      location_id = results[0].id;
-    }
-  });
+  function queryLocation() {
+    connection.query("SELECT * FROM `mp_locations` WHERE `reference_location` = " + connection.escape(reference_location) + " LIMIT 0, 1", function (error, results){
+      if(error) throw error;
+      if(!results.length) {
+        var connection = mysql.createConnection(options);
+        var parameters = [latitude_location, longitude_location, reference_location, description_location];
+        var query = "INSERT INTO `" + database + "`.`mp_locations`(`id_location`, `latitude_location`, `longitude_location`, `reference_location`, `description_location`) VALUES(NULL, ?, ?, ?, ?)";
+        connection.query(query, parameters, function (error, results){
+          if(error) throw error;
+          id_location = results.insertId;
+          console.log("Location successfully created in the database with id: " + id_location);
+          queryMusic();
+        });
+      } else {
+        id_location = results[0].id_location;
+        console.log("Location exists in the database with id: " + id_location);
+        queryMusic();
+      }
+    });
+  };
 
   // Enter URI in database: mp_music
   // Or retrieve music identifier if music already exists
-  connection.query("SELECT * FROM `mp_music` WHERE `uri` = '" + request.body.music_uri + "' LIMIT 0, 1", function (error, results){
-    if(error) throw error;
-    if(!results.length){
-      connection.query("INSERT INTO `" + database + "`.`mp_musics`(`id_music`, `uri_music`) VALUES(NULL, '" + request.body.music_uri + "')", function (error, results){
-        if(error) throw error;
-        music_id = results.insertId;
-        console.log('Music entry inserted successfully in the database: ' + request.body.music_uri);
-      });
-    } else{
-      console.log('Music entry already exists in the database: ' + request.body.music_uri);
-      music_id = results[0].id;
-    }
-  });
+  function queryMusic() {
+    connection.query("SELECT * FROM `mp_musics` WHERE `uri_music` = " + connection.escape(uri_music) + " LIMIT 0, 1", function (error, results){
+      if(error) throw error;
+      if(!results.length) {
+        var connection = mysql.createConnection(options);
+        connection.query("INSERT INTO `" + database + "`.`mp_musics`(`id_music`, `uri_music`) VALUES(NULL, " + connection.escape(uri_music) + ")", function (error, results){
+          if(error) throw error;
+          id_music = results.insertId;
+          console.log("Music successfully created in the database with id: " + id_music);
+          queryPin();
+        });
+      } else {
+        id_music = results[0].id_music;
+        console.log("Music exists in the database with id: " + id_music);
+        queryPin();
+      }
+    });
+  };
 
   // Terminate MySQL connection to execute location and music queries
-  connection.end(function(){
-    // Restart the mySQL connection
-    connection = mysql.createConnection({
-      host:     host,
-      user:     user,
-      password: password,
-      database: database
-    });
-    // Enter pin entry in database: mp_pins
-    var parameters = [request.body.description, user_id, location_id, music_id];
-    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id_pin`, `description_pin`, `user_id`, `location_id`, `music_id`) VALUES(NULL, ?, ?, ?, ?)";
+  function queryPin() {
+    var parameters = [description_pin, user_pin, id_location, id_music];
+    var query = "INSERT INTO `" + database + "`.`mp_pins`(`id_pin`, `description_pin`, `user_pin`, `location_pin`, `music_pin`) VALUES(NULL, ?, ?, ?, ?)";
     connection.query(query, parameters, function (error, results){
       if(error) throw error;
-      console.log('Pin entry inserted successfully in the database: ');
+      console.log("Pin successfully created in the database with user id: " + user_pin);
     });
-  });
+  }
 
   response.writeHead(200, {'Content-Type': 'application/json'});
   response.write('', 'utf-8');

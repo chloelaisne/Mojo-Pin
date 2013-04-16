@@ -18,13 +18,15 @@ App.FriendsView = Backbone.View.extend({
 
 	invite: function()
 	{
+		// Dialog metas
 		var title = "Invite your friends to Mojo Pin";
 		var message = "Mojo Pin is a Spotify App that helps people share their personal attachment to the music they listen to.";
 		var redirect_uri = "http://www.chloelaisne.com";
+
 		Spotify.Auth.showAuthenticationDialog("http://www.facebook.com/dialog/apprequests?app_id="+App.FACEBOOK["app_identifier"]+"&title="+encodeURIComponent(title)+"&message="+encodeURIComponent(message)+"&display=popup&redirect_uri="+encodeURIComponent(redirect_uri), redirect_uri, {
-			onSuccess : function(response) {},
-			onFailure : function(error) {},
-			onComplete : function() {}
+			onSuccess 	: function(response) {},
+			onFailure 	: function(error) {},
+			onComplete	: function() {}
 		});
 	},
 
@@ -77,9 +79,7 @@ App.FriendsView = Backbone.View.extend({
 
 	renderFriends: function()
 	{
-		// Empty view for re-render
-		/*if($(".friendslist"))
-			$(".friendslist").children().remove();*/
+		$("#global").css({"height": $("body").height() - 52 + "px"});
 
 		// Bind this to self for functions below
 		var self = this;
@@ -89,10 +89,9 @@ App.FriendsView = Backbone.View.extend({
 			_(this.collectionGroups.true).each(function(friend, index){
 				// Create model and view
 				var friendView = new App.FriendView({ model: new App.Friend(friend.attributes) });
-				self.$(".friendslist").append((friendView.render()).el);
+				self.$("#friendslist ul").append((friendView.render()).el);
 			});
 		}
-
 
 		return this;
 	},

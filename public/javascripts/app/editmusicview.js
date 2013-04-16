@@ -1,19 +1,20 @@
 App.EditMusicView = Backbone.View.extend({
-	
+
 	attributes:
 	{
-		id: "music"
+		id 		: "music",
+		class	: "edit"
 	},
 
 	events:
 	{
-		"click #dropzone"	: "removeMusic",
+		"click #dropzone"		: "removeMusic",
 		"click .track"		: "setCurrentTrack"
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'uriChanged', 'render', 'setUri', 'renderSearchModule', 'renderPlayerModule', 'renderDragDropModule', 'renderTitle', 'removeMusic');
+		_.bindAll(this, 'uriChanged', 'render', 'setUri', 'renderPlayer', 'renderDragDropModule', 'removeMusic');
 
 		App.Events.on("onSearchChanged", this.setUri);
 
@@ -23,7 +24,6 @@ App.EditMusicView = Backbone.View.extend({
 		}
 		else
 		{
-			App.Events.trigger("changeMusic", this.model.get("uri"));
 			this.model.getSpotifyModel();
 		}
 
@@ -32,7 +32,7 @@ App.EditMusicView = Backbone.View.extend({
 
 		this.searchMusicModuleView = new App.SearchMusicModuleView();
 
-		Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, this.renderPlayerModule);
+		Spotify.Player.observe(Spotify.Models.EVENT.CHANGE, this.renderPlayer);
 		
 		// Set the model URI when track dropped onto the Application tab
 		var self = this;
@@ -43,62 +43,64 @@ App.EditMusicView = Backbone.View.extend({
 
 	uriChanged: function()
 	{
-		App.Events.trigger("changeMusic", this.model.get("uri"));
 		App.Events.trigger("UpdateNavigation", this.model.get("uri"));
+
 		if(typeof this.model.get("uri") != undefined)
 			this.model.getSpotifyModel();
 	},
 
-	removeMusic: function()
+	removeMusic: function(e)
 	{
-		if(typeof this.model.get("uri") != 'undefined')
-			App.Events.trigger('delSession', 'music');
+		e.preventDefault();
+
+		if(typeof this.model.get("uri") != "undefined" && this.model.get("uri") != null)
+		{
+			this.model.clear("uri");
+		}
 	},
 
-	setCurrentTrack: function()
+	setCurrentTrack: function(e)
 	{
+		e.preventDefault();
+
 		this.model.set({ uri: Spotify.Player.track.uri });
 	},
 
-	setUri: function(uri)
+	setUri: function(data)
 	{
-		this.model.set({ uri: uri });
+		this.model.set({ uri: data.uri });
 	},
 
 	renderDragDropModule: function()
 	{
-		if(this.$("#dropzone"))
-			this.$("#dropzone").remove();
-
 		if(this.model.get("uri") != null)
 		{
 			this.dropzoneSettings =
 			{
-				trackname 		: this.model.get("name"),
+				trackname 		: this.model.get("track"),
 				trackartists 	: this.model.get("artists"),
 				trackimage 		: this.model.get("image")
 			};
 			this.dropzoneTemplate = _.template(Templates.DropzoneActive)(this.dropzoneSettings);
+			this.$("#dropzone").removeClass("blank");
 
 			App.Events.trigger("EditMusicComplete");
 		}
 		else
 		{
 			this.dropzoneTemplate = _.template(Templates.DropzoneInactive);
+			this.$("#dropzone").addClass("blank");
 
 		}
 
-		$(this.el).append(this.dropzoneTemplate);
+		this.$("#dropzone").html(this.dropzoneTemplate)
+
+		// Shorten trackname if length is over a line
 		$(".track-name").text(Utils.ShortenString($(".track-name")));
 	},
 
-	renderPlayerModule: function()
+	renderPlayer: function()
 	{
-		// Append Template to DOM
-		if(this.$(".player").length == 0){
-			$(this.el).append(Templates.Player);
-		}
-
 		if(Spotify.Player.playing == true)
 		{
 			this.$(".player .track").html(Spotify.Player.track.name + " by " + Spotify.Player.track.artists.join(", "));
@@ -108,37 +110,16 @@ App.EditMusicView = Backbone.View.extend({
 		{
 			this.$(".player").css("display", "none");
 		}
-		
-		return this;	
-	},
-
-	renderSearchModule: function()
-	{
-		if(this.$("#search"))
-			this.$("#search").remove();
-
-		$(this.el).append((this.searchMusicModuleView.render()).el);
-	},
-
-	renderTitle: function()
-	{
-		if(this.$("h2"))
-			this.$("h2").remove();
-
-		$(this.el).prepend(Templates.EditMusicTitle);
 	},
 
 	render: function()
 	{
-		//App.Events.trigger("changeRoute", "music");
+		$(this.el).html(Templates.Music);
+		this.$("#search").html((this.searchMusicModuleView.render()).el);
 
-		// Delegate events when view is re-rendered
-		this.delegateEvents();
-
-		this.renderTitle();
-		this.renderSearchModule();
-		this.renderPlayerModule();
+		this.renderPlayer();
 		this.renderDragDropModule();
+
 		return this;
 	}
 

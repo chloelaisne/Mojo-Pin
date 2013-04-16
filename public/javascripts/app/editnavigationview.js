@@ -4,61 +4,74 @@ App.EditNavigationView = Backbone.View.extend({
 
 	events:
 	{
-		"click #previous"	: "clickPrevious",
-		"click #next"		: "clickNext",
-		"click #cancel"		: "clickCancel"
+		"click #previous"		: "clickPrevious",
+		"click #next"			: "clickNext",
+		"click #cancel"			: "clickCancel",
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this,'setMusicNavigationState', 'setLocationNavigationState', 'setDescriptionNavigationState', 'render', 'clickPrevious', 'clickNext', 'clickCancel');
+		_.bindAll(this,'setMusicNavigation', 'setLocationNavigation', 'setDescriptionNavigation', 'render', 'clickPrevious', 'clickNext', 'clickCancel');
 
-		this.model 							= new App.EditNavigation();
-		this.model.bind("change:music"		, this.setMusicNavigationState);
-		this.model.bind("change:location"	, this.setLocationNavigationState);
-		this.model.bind("change:description", this.setDescriptionNavigationState);
+		this.model 							= new Backbone.Model({ music: false, location: false, description: true });
+		this.model.bind("change:music"		, this.setMusicNavigation);
+		this.model.bind("change:location"	, this.setLocationNavigation);
+		this.model.bind("change:description", this.setDescriptionNavigation);
 	},
 
-	setMusicNavigationState: function()
+	setMusicNavigation: function()
 	{
-		this.previous = { label: "Cancel", theme: "dark", icon: 0, state: 1, goto: null };
-		this.next = { id: 'music', goto: 'location', label: "Next", theme: "crossbreed", icon: 1, state: this.model.get("music"), route: "edit/location" };
-		this.cancel = { route: null };
+		this.previous = { id: null, label: "Cancel", theme: "dark", icon: 0, state: 1 };
+		this.next = { id: "location", label: "Next", theme: "crossbreed", icon: 1, state: this.model.get("music") };
+		this.cancel = null;
+
+		// Set current view
+		this.model.set({ view: "music" });
+
+		// Re-render navigation
 		this.render();
 	},
 
-	setLocationNavigationState: function()
+	setLocationNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, goto: "music" };
-		this.next = { id: 'location', goto: 'description', label: "Next", theme: "light", icon: 1, state: this.model.get("location"), route: "edit/description" };
-		this.cancel = { route: "/user/chloelaisne" };
+		this.previous = { id: "music", label: "Previous", theme: "light", icon: 1, state: 1};
+		this.next = { id: "description", label: "Next", theme: "light", icon: 1, state: this.model.get("location") };
+		this.cancel = { id: null };
+
+		// Set current view
+		this.model.set({ view: "location" });
+
+		// Re-render navigation
 		this.render();
 	},
 
-	setDescriptionNavigationState: function()
+	setDescriptionNavigation: function()
 	{
-		this.previous = { label: "Previous", theme: "light", icon: 1, state: 1, goto: "location" };
-		this.next = { id: 'description', goto: null, label: "Done", theme: "primary", icon: 0, state: this.model.get("description"), route: "/user/chloelaisne" };
-		this.cancel = { route: "/user/chloelaisne" };
+		this.previous = { id: "location", label: "Previous", theme: "light", icon: 1, state: 1};
+		this.next = { id: "save", label: "Done", theme: "primary", icon: 0, state: this.model.get("description") };
+		this.cancel = { id: null };
+
+		// Set current view
+		this.model.set({ view: "description" });
+
+		// Re-render navigation
 		this.render();
 	},
 
 	clickPrevious: function(e)
 	{
 		e.preventDefault();
-		if(this.previous.goto != null && this.previous.state == true)
-		{
-			App.Events.trigger('changeRoute', this.previous.goto);
-		}
+
+		App.Events.trigger('navigationRoute', this.previous.id);
 	},
 
 	clickNext: function(e)
 	{
 		e.preventDefault();
-		if(this.next.route != null && this.next.state == true)
+
+		if(this.next.state == true)
 		{
-			App.Events.trigger('setSession', this.next.id);
-			App.Events.trigger('changeRoute', this.next.goto);
+			App.Events.trigger('navigationRoute', { route: this.next.id, silent: this.next.silent });
 		}
 
 	},
@@ -66,36 +79,19 @@ App.EditNavigationView = Backbone.View.extend({
 	clickCancel: function(e)
 	{
 		e.preventDefault();
-		if(this.cancel.route != null)
-		{
-			App.Events.trigger('delSession');
-			App.router.navigate(this.cancel.route, true);
-			this.unrender();
-		}
+
+		App.Events.trigger('navigationRoute', this.cancel.id);
 	},
 
 	render: function()
 	{
-		// Unrender navigation
-		this.unrender();
+		// Re-delegate events to new DOM elements
+		this.delegateEvents();
 
-		this.templateSettings =
-		{
-			previous 	: this.previous,
-			next 		: this.next,
-			cancel 		: this.cancel
-		}
+		this.templateSettings = { previous: this.previous, next: this.next, cancel: this.cancel };
 
-		this.setElement(this.template(this.templateSettings));
-		
-		$("#global").append(this.el);
+		this.$el.html(this.template(this.templateSettings));
 
 		return this;
-	},
-
-	unrender: function()
-	{
-		if($(this.el))
-			$(this.el).remove();
 	}
 });

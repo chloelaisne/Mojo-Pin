@@ -24,11 +24,7 @@ App.LocationView = Backbone.View.extend({
 		if(typeof e != 'undefined')
 			e.preventDefault();
 
-		App.Events.trigger("setLocation",
-		{
-			reference	: this.model.get('reference'),
-			description	: this.model.get('description')
-		});
+		App.Events.trigger("setLocation", { reference: this.model.get('reference'), description: this.model.get('description')	});
 	},
 
 	

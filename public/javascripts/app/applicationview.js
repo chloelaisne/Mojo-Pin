@@ -9,34 +9,29 @@ App.ApplicationView = Backbone.View.extend({
 		'click #goto-profile'	: 'gotoProfile',
 		'click #goto-friends'	: 'gotoFriends',
 		'click #goto-edit'		: 'gotoEdit',
-		//'click #goto-logout'	: 'gotoLogout'
+		'click #goto-logout'	: 'gotoLogout'
 	},
 
 	initialize: function()
 	{
 		_.bindAll(
 			this, 'gotoNews', 'gotoProfile', 'gotoFriends', 'gotoEdit', 'gotoLogout',
-			'changeStateView', 'sessionChanged', 'activeState',
-			'renderNavigation', 'render');
+			'changeAplicationStateView', 'activeState',
+			'renderHeader', 'render');
 
-		this.model = new Backbone.Model({
-			state 			: Spotify.Session.state,
-			classname 		: null
+		this.model = new Backbone.Model({ state: Spotify.Session.state, classname: null });
+		this.model.bind("change:state", this.changeAplicationStateView);
+
+		// Listen to Spotify online/offline changes
+		var self = this;
+		Spotify.Models.session.observe(Spotify.Models.EVENT.STATECHANGED, function(){
+			self.model.set({ state: Spotify.Models.session.state });
 		});
-
-		this.model.bind("change:state", this.changeStateView);
-
-		Spotify.Models.session.observe(Spotify.Models.EVENT.STATECHANGED, this.sessionChanged);
 	},
 
-	changeStateView: function()
+	changeAplicationStateView: function()
 	{
-		App.Events.trigger("StateChanged", this.model.get("state"));
-	},
-
-	sessionChanged: function()
-	{
-		this.model.set({ state: Spotify.Models.session.state });
+		App.Events.trigger("ApplicationStateChanged", this.model.get("state"));
 	},
 
 	/*
@@ -99,7 +94,7 @@ App.ApplicationView = Backbone.View.extend({
 		$(e.target).addClass('active');
 	},
 
-	renderNavigation: function()
+	renderHeader: function()
 	{
 		if($("#header").length == 0)
 			$(this.el).prepend(Templates.Header);
@@ -107,8 +102,8 @@ App.ApplicationView = Backbone.View.extend({
 
 	render: function()
 	{
-		$(this.el).html(this.template);
-		this.renderNavigation();
+		this.$el.html(this.template);
+		this.renderHeader();
 		return this;
 	}
 

@@ -1,48 +1,103 @@
 App.EditView = Backbone.View.extend({
 
-	events:
-	{
-		"click #save"	: "savePin"
-	},
-
 	views: {},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setRoute', 'renderRoute', 'getSession', 'setSession', 'delSession', 'setMusicModel', 'setLocationModel', 'renderEditMusic', 'renderEditLocation', 'renderEditDescription', 'render', 'savePin');
+		_.bindAll(this, 'saveEdit', 'setRoute', 'setMusicModel', 'setLocationModel', 'setDescriptionModel', 'renderMusic', 'renderLocation', 'renderDescription', 'render');
 
-		this.view 					= null;
+		this.views.editMusic 		= new App.EditMusicView();
+		this.views.editLocation 	= new App.EditLocationView();
+		this.views.editDescription 	= new App.EditDescriptionView();
 		this.editNavigation 		= new App.EditNavigationView();
 
-		this.model 							= new App.Pin();
-
-		App.Events.on("setSession"			, this.setSession);
-		App.Events.on("delSession"			, this.delSession);
+		this.model 		= new App.Pin();
+		this.model.set({ route: "music" });
+		this.model.bind("change:route", this.render);
 
 		App.Events.on("changeMusic"			, this.setMusicModel);
 		App.Events.on("changeLocation"		, this.setLocationModel);
 		App.Events.on("changeDescription"	, this.setDescriptionModel);
-		App.Events.on("changeRoute"			, this.setRoute);
 
-		this.getSession();
-
-		
+		// Event caught when any navigation button clicked
+		App.Events.on("delLocation"			, this.setLocationModel);
+		App.Events.on("navigationRoute"		, this.setRoute);
 	},
 
-	setRoute: function(route)
+	setRoute: function(data)
 	{
-		this.model.set({ route: route });
+		this.model.set({ route: data.route });
+	},
 
-		// Render view
-		this.renderRoute();
+	saveEdit: function(description)
+	{
+		console.log('Saving with id: ' + App.FACEBOOK["user_id"]);
 
+		if(typeof this.model.get("description") == "undefined" || this.model.get("description") == null)
+			this.model.set({ "description": "" });
+
+		var data =
+		{
+			music_uri 				: this.model.get("music_uri"),
+			location_reference		: this.model.get("location_reference"),
+			location_latitude		: this.model.get("location_latitude"),
+			location_longitude		: this.model.get("location_longitude"),
+			location_description	: this.model.get("location_description"),
+			description 			: this.model.get("description"),
+			user 					: App.FACEBOOK["user_id"]
+		};
+
+		$.ajax({
+			type 	: 'POST',
+			url 	: 'http://localhost:3000/json/pin',
+			data 	: data
+		})
+		.done(function (data, textStatus, jqXHR){
+			console.log(data);
+		});
+	},
+
+	resetEdit: function()
+	{
+		// Clear all models previously set
+		this.model.clear();
+		this.views.editMusic.model.clear({ silent: true });
+		this.views.editLocation.model.clear({ silent: true });
+		// Reset map to Facebook user's location
+		this.views.editLocation.mapModuleView.model.set({ latitude: App.FACEBOOK['user_location']['latitude'], longitude: App.FACEBOOK['user_location']['longitude'] });
+		// Clear marker and info window from the map
+		this.views.editLocation.mapModuleView.unsetLocation();
+		this.views.editDescription.model.clear({ silent: true });
+		this.editNavigation.model.set({ music: false, location: false, description: false });
+
+		App.router.navigate("/user/" + App.FACEBOOK["user_id"], true);
 	},
 
 	render: function()
 	{
-		// If session data fetched and object initialized
-		if(typeof this.views.editMusic != 'undefined' || typeof this.views.editLocation != 'undefined' || typeof this.views.editDescription != 'undefined' )
-			this.renderRoute();
+		switch(this.model.get("route"))
+		{
+			case null:
+				this.resetEdit();
+				break;
+			case "save":
+				this.saveEdit();
+				this.resetEdit();
+				break;
+			case "description":
+				this.editNavigation.setDescriptionNavigation();
+				this.renderDescription();
+				break;
+			case "location":
+				this.editNavigation.setLocationNavigation();
+				this.renderLocation();
+				break;
+			case "music":
+			default:
+				this.editNavigation.setMusicNavigation();
+				this.renderMusic();
+				break;
+		}
 
 		return this;
 	},
@@ -53,16 +108,27 @@ App.EditView = Backbone.View.extend({
 
 	setDescriptionModel: function()
 	{
-		this.model.set
-		({
-			"description"			: this.views.editDescription.model.get("description")
-		});
+		this.model.set({ description: this.views.editDescription.model.get("description") });
 	},
 
-	renderEditDescription: function()
+	renderDescription: function()
 	{
+		this.views.editDescription.model.set(this.model.toJSON());
+
 		$(this.el).html((this.views.editDescription.render()).el);
+
+		if($("div.pagination").length != 0)
+			$("div.pagination").remove();
+
+		$(this.el).append((this.editNavigation.render()).el);
+
 		google.maps.event.trigger(this.views.editDescription.mapModuleView.map, "resize");
+		this.views.editDescription.mapModuleView.setCenter();
+
+		// Delegate events when view is re-rendered
+		this.views.editDescription.delegateEvents();
+
+		return this;
 	},
 
  /* ==================================================
@@ -88,190 +154,78 @@ App.EditView = Backbone.View.extend({
 			this.model.unset("location_latitude");
 			this.model.unset("location_longitude");
 			this.model.unset("location_description");
+			// Clear marker and info window from the map
+			this.views.editLocation.mapModuleView.unsetLocation();
 			this.editNavigation.model.set({ location: false });
 		}
 	},
 
-	renderEditLocation: function()
+	renderLocation: function()
 	{
 		$(this.el).html((this.views.editLocation.render()).el);
-		google.maps.event.trigger(this.views.editLocation.mapModuleView.map, "resize");
+
+		if($("div.pagination").length != 0)
+			$("div.pagination").remove();
+
+		$(this.el).append((this.editNavigation.render()).el);
+
+		// Set timer to resize the map panes when all DOM rendered
+		var self = this;
+		setTimeout(function() {
+			google.maps.event.trigger(self.views.editLocation.mapModuleView.map, "resize");
+			self.views.editLocation.mapModuleView.setCenter();
+		}, 10)
+
+		// Delegate events when view is re-rendered
+		this.views.editLocation.delegateEvents();
+		this.views.editLocation.searchLocationModuleView.delegateEvents();
+
+		return this;
 	},
 
  /* ==================================================
 	===== Music model and view
 	================================================== */
 
-	setMusicModel: function(uri)
+	setMusicModel: function(model)
 	{
-		if(typeof uri != 'undefined')
+		if(typeof model.get("uri") != 'undefined')
 		{
 			// If Music model set from outside the view e.g. LINKSCHANGED event
 			if(Backbone.history.fragment != "edit") {
 				App.router.navigate("/edit", true);
-				this.renderEditMusic();
 			}
 
-			this.model.set({ "music_uri": uri });
+			this.model.set({
+				"music_uri"		: model.get("uri"),
+				"music_track"	: model.get("track"),
+				"music_artists"	: model.get("artists")
+			});
 			this.editNavigation.model.set({ music: true });
 		}
 		else
 		{
 			
 			this.model.unset("music_uri");
+			this.model.unset("music_track");
+			this.model.unset("music_artists");
 			this.editNavigation.model.set({ music: false });
 		}
 	},
 
-	renderEditMusic: function()
+	renderMusic: function()
 	{
-		console.log("renderEditMusic");
 		$(this.el).html((this.views.editMusic.render()).el);
-	},
 
- /* ==================================================
-	===== Get session data and initialize views
-	================================================== */
+		if($("div.pagination").length != 0)
+			$("div.pagination").remove();
 
-	getSession: function()
-	{
-		var self = this;
+		$(this.el).append((this.editNavigation.render()).el);
 
-		console.log("getSession 1");
+		// Delegate events when view is re-rendered
+		this.views.editMusic.delegateEvents();
 
-		$.ajax({
-			url 	: 'http://localhost:3000/json/session/pin',
-			type 	: 'GET'
-		})
-		.done(function (data, textStatus, jqXHR){
-
-			var cookie = data.cookie;
-
-			if((typeof cookie.music == 'undefined' || cookie.music == null) && (typeof cookie.location == 'undefined' || cookie.location == null))
-			{
-				self.views.editMusic = new App.EditMusicView();
-				self.views.editLocation = new App.EditLocationView();
-				self.views.editDescription 	= new App.EditDescriptionView();
-				self.model.set({ route: "music" });
-				console.log("getSession music");
-			}
-			else if((typeof cookie.music != 'undefined' && cookie.music != null) && (typeof cookie.location == 'undefined' || cookie.location == null))
-			{
-				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
-				self.views.editLocation = new App.EditLocationView();
-				self.views.editDescription 	= new App.EditDescriptionView();
-				self.model.set({ route: "location" });
-				console.log("getSession location");
-			}
-			else if((typeof cookie.music != 'undefined' && cookie.music != null) && (typeof cookie.location != 'undefined' && cookie.location != null))
-			{
-				self.views.editMusic = new App.EditMusicView({ model: new App.Music({ uri: cookie.music }) });
-				self.views.editLocation = new App.EditLocationView({ model: new App.Location({ reference: cookie.location }) });
-				self.views.editDescription 	= new App.EditDescriptionView();
-				self.model.set({ route: "description" });
-				console.log("getSession description");
-			}
-
-			console.log("getSession 2");
-			// Render view
-			self.renderRoute();
-
-		})
-		.fail(function (jqXHR, textStatus, errorThrown){ console.log("getSession fail"); });
-	},
-
-	renderRoute: function()
-	{
-		
-		switch(this.model.get("route"))
-		{
-			case "description":
-				this.renderEditDescription();
-				this.editNavigation.setDescriptionNavigationState();
-				break;
-			case "location":
-				this.renderEditLocation();
-				this.editNavigation.setLocationNavigationState();
-				break;
-			case "music":
-			default:
-				this.renderEditMusic();
-				this.editNavigation.setMusicNavigationState();
-				break;
-		}
-	},
-
- /* ==================================================
-	===== Update session data
-	================================================== */
-
-	setSession: function(name)
-	{
-		if(name == 'music')
-			object = { music: this.views.editMusic.model.get("uri") };
-		else if(name == 'location')
-			object = { location: this.views.editLocation.model.get("reference") };
-
-		$.ajax({
-			url 	: 'http://localhost:3000/json/session/pin',
-			type 	: 'POST',
-			data 	: object
-		});
-	},
-
- /* ==================================================
-	===== Delete session data
-	================================================== */
-
-	delSession: function(name)
-	{
-		var self = this;
-
-		if(name == 'music')
-		{
-			this.views.editMusic.model.clear();
-			object = { music: null };
-		}
-		else if(typeof name == 'undefined')
-		{
-			this.model.clear();
-			object = {};
-		}
-
-		$.ajax({
-			type 	: 'DELETE',
-			url		: 'http://localhost:3000/json/session/pin',
-			data	: object
-		})
-		.done(function (data, textStatus, jqXHR){
-			self.editNavigation.model.set({ "music": false });
-		})
-		.fail(function (jqXHR, textStatus, errorThrown){ console.log("delSession fail"); });
-	},
-
- /* ==================================================
-	===== Save data to the database
-	================================================== */
-
-	savePin: function()
-	{
-		if(this.model.get("music_uri") != null && this.model.get("music_uri") != "" && this.model.get("location_reference") != null && this.model.get("location_reference") != "")
-		{
-			$.ajax({
-				type	: 'POST',
-				url		: '/json/pin',
-				data	:
-				{
-					music_uri				: this.model.get("music_uri"),
-					location_reference		: this.model.get("location_reference"),
-					location_latlng			: this.model.get("location_latlng"),
-					location_description	: this.model.get("location_description"),
-					description				: this.model.get("description")
-				}
-			})
-			.done(function (data, textStatus, jqXHR){ console.log("Succeeded to save pin in database"); })
-			.fail(function (jqXHR, textStatus, errorThrown){ console.log("Failed to save pin in database"); });
-		}
+		return this;
 	}
 
 });

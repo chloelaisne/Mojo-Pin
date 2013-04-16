@@ -1,9 +1,6 @@
 App.ConfirmationWindowView = Backbone.View.extend({
 
-	initialize: function()
-	{
-		
-	}
+	initialize: function(){}
 	
 });
 
@@ -30,9 +27,6 @@ _.extend(App.ConfirmationWindowView.prototype, Backbone.View.prototype, google.m
 
 		var panes = this.getPanes();
 		panes.overlayLayer.appendChild(div);
-
-		console.log("outerWidth", $(div).outerWidth());
-		console.log("outerHeight", $(div).outerHeight());
 
 		this.width = $(div).outerWidth();
 		this.height = $(div).outerHeight();

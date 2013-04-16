@@ -259,14 +259,17 @@ body.login #global {
 }
 
 .mp-facebook {
-	background: transparent url(../images/social_icons.png) no-repeat 0 -16px !important;
-	width: 16px !important;
-	height: 16px !important;
-	overflow: hidden !important;
-	padding: 0 !important;
-	display: block !important;
-	float: left !important;
-	position: absolute !important;
+background: transparent url(../images/social_icons.png) no-repeat 0 -16px !important;
+width: 16px !important;
+height: 16px !important;
+overflow: hidden !important;
+padding: 0 !important;
+display: block !important;
+float: left !important;
+top: 0 !important;
+margin-right: 5px !important;
+left: 0 !important;
+position: relative !important;
 }
 
 .mp-twitter {
@@ -277,7 +280,10 @@ body.login #global {
 	padding: 0 !important;
 	display: block !important;
 	float: left !important;
-	position: absolute !important;
+	top: 0 !important;
+	margin-right: 5px !important;
+	left: 0 !important;
+	position: relative !important;
 }
 
 
@@ -323,9 +329,11 @@ body.login #global {
 	font-size: 11px;
 	text-shadow: 0 1px 0 #ffffff;
 	padding: 2px;
-	padding-left: 20px;
 	font-weight: bold;
 	position: relative;
+	line-height: 16px;
+	padding-left: 0 !important;
+	margin-right: 8px;
 }
 
 .mp-social.active {
@@ -591,12 +599,24 @@ nav ul li.active {
 
 .window.notice .music {
 	color: #999997;
-	font-size: 15px;
+	font-size: 13px;
 	margin-bottom: 10px;
 }
 
-.window.notice .music span {
+.window.notice .music .mp-track {
+	top: 2px;
+}
+
+.window.notice .location .mp-location {
+	top: 1px;
+}
+
+.window.notice .music .track {
 	color: #ffffff;
+}
+
+.window.notice .music .artists {
+	font-weight: bold;
 }
 
 .window.notice .location {
@@ -604,7 +624,7 @@ nav ul li.active {
 	font-size: 11px;
 }
 
-.window.information {
+.window.information, .window.notice {
 	box-shadow: 0 5px 10px rgba(0,0,0,.5);
 }
 
@@ -783,34 +803,28 @@ span.friends {
 	margin: 6px 9px;
 }
 
-.friendslist {
-	height: 624px;
+#friendslist {
 	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 100%;
+	height: 100%;
 }
 
-.friendslist li {
+#friendslist ul {
+margin: 0 auto;
+padding: 20px 0 40px 0;
+display: block;
+overflow: hidden
+}
+
+#friendslist li {
 	float: left;
 	margin: 36px 20px 0 20px;
+	width: 130px;
 }
 
-.picture {
-	position: relative;
-	text-align: center;
-	cursor: default;
-}
 
-.picture button{
-	position: absolute;
-	bottom: 7px;
-	left: 11px;
-	cursor: default;
-}
-
-.picture button:hover{
-	cursor: pointer;
-}
-
-.friendslist .picture div {
+#friendslist .picture div {
 	display: block;
 	width: 130px;
 	height: 130px;
@@ -822,26 +836,27 @@ span.friends {
 	box-shadow: 0 0 4px rgba(0,0,0,0.5), 0 0 1px rgba(255,255,255,0.5) inset;
 }
 
-.friendslist span {
+#friendslist span {
 	display: block;
-	width: 130px;
-	height: 34px;
-	text-align: center;
-	color: #a19fa0;
-	text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
-	font-size: 12px;
-	font-weight: bold;
-	margin-top: 6px;
-	text-decoration: none;
+width: 100%;
+height: 34px;
+text-align: center;
+color: #A19FA0;
+text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
+font-size: 12px;
+font-weight: bold;
+margin-top: 6px;
+text-decoration: none;
 }
 
-.friendslist a {
+#friendslist a {
 	text-decoration: none;
-	cursor: default;
-	display:inline;
+cursor: default;
+display: block;
+width: 130px;
 }
 
-.friendslist a:hover {
+#friendslist a:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
@@ -899,18 +914,36 @@ form {
 	position: relative;
 	text-align: center;
 	z-index: 10;
+	width: 333px;
+	margin: 0 auto;
+}
+
+.search.error form input {
+	border: 1px solid #a03c39;
+	box-shadow: 0 2px 3px #d5d5d5 inset, 0 1px 2px #ff7f79, 0 -1px 2px #ff7f79, 1px 0 2px #ff7f79, -1px 0 2px #ff7f79;
+}
+
+.search.error form label {
+	display: block;
+	text-align: center;
+	color: #C75A55;
+	width: 333px;
+	top: 25px;
+	position: absolute;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 form input {
 	width: 293px;
 	height: 20px;
+	line-height: 20px;
 	border: 1px solid #292929;
 	-webkit-border-radius: 20px;
 	box-shadow: 0 2px 3px #d5d5d5 inset;
 	margin: 0 0 10px 0;
 	font-size: 11px;
 	padding: 0 10px 0 28px;
-	background: #ffffff url(../images/search_icon-large.png) no-repeat 5px 3px;
+	background: #ffffff url(../images/search_icon.png) no-repeat 10px 4px;;
 	cursor: text;
 }
 
@@ -927,13 +960,13 @@ form input:focus {
 	box-shadow: 0 2px 3px #d5d5d5 inset, 0 1px 2px rgba(94,169,212,1), 0 -1px 2px rgba(94,169,212,1), 1px 0 2px rgba(94,169,212,1), -1px 0 2px rgba(94,169,212,1);
 }
 
-.player {
+.edit .player {
 	font-size: 11px;
 	color: #a19fa0;
 	text-align: center;
 }
 
-.player .track {
+.edit .player .track {
 	color: #f6f0ad;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
 	padding-left: 32px;
@@ -941,7 +974,7 @@ form input:focus {
 	overflow: hidden;
 }
 
-.player .track:hover {
+.edit .player .track:hover {
 	background-position: 10px -11px;
 	color: #5ea9d4;
 	cursor: pointer;
@@ -1019,7 +1052,7 @@ form input:focus {
 	width: 435px;
 }
 
-.music #search {
+#music #search {
 	position: relative;
 	width: 333px;
 	margin: 0 auto;
@@ -1036,6 +1069,7 @@ form input:focus {
 	top: 27px;
 	z-index: 1;
 	box-shadow: 0 0 1px rgba(0,0,0,0.5);
+	display: none;
 }
 
 .results .title {
@@ -1062,6 +1096,7 @@ form input:focus {
 	height: 28px;
 	line-height: 28px;
 	padding-left: 34px;
+	overflow: hidden;
 }
 
 .results li:hover {
@@ -1115,9 +1150,13 @@ textarea {
 	border: 1px solid #b3b3b3;
 	border-radius: 3px;
 	padding: 7px;
-	color: #a9a9a9;
+	color: #000000;
 	font-size: 12px;
 	box-shadow: 0 1px 0 #e5e5e5 inset;
+}
+
+textarea.inactive {
+	color: #a9a9a9;
 }
 
 .social {

@@ -1,6 +1,8 @@
-App.TrackResultsView = Backbone.View.extend({
-	template: _.template(Templates.TrackResults),
-	initialize: function(){
+App.TrackResultsView = Backbone.View.extend
+({
+
+	initialize: function()
+    {
 		_.bindAll(this, 'render');
 
 		this.searchSettings = {
@@ -13,17 +15,20 @@ App.TrackResultsView = Backbone.View.extend({
 
         this.search = new Spotify.Models.Search(this.options.query, this.searchSettings);
 	},
-	render: function(){
-		$(this.el).html(this.template);
+	render: function()
+    {
+		this.$el.html(Templates.TrackResults);
 
 		var self = this;
 
-        this.search.observe(Spotify.Models.EVENT.CHANGE, function(){
+        this.search.observe(Spotify.Models.EVENT.CHANGE, function()
+        {
             self.collection = new Backbone.Collection(self.search.tracks);
 
-            self.collection.forEach(function(data) {
-                var resultView = new App.ResultView({ model: data });
-                $(self.el).find("ul").append((resultView.render()).el);
+            self.collection.forEach(function(data)
+            {
+                var resultView = new App.ResultView({ tagName: "li", model: data });
+                self.$("ul").append((resultView.render()).el);
             });
         });
 

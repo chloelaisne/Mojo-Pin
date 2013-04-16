@@ -1,74 +1,60 @@
 App.EditLocationView = Backbone.View.extend({
 	
-	attributes:
+attributes:
 	{
-		id: "location"
+		id		: "location",
+		class	: "edit"
 	},
 
 	initialize: function()
 	{
-		_.bindAll(this, 'setLocation', 'renderSearchModule', 'renderMapModule', 'render');
+		_.bindAll(this, 'setLocation', 'renderMapModule', 'render');
+
+		$(this.el).html(Templates.Location);
+
 		this.searchLocationModuleView = new App.SearchLocationModuleView();
-		this.mapModuleView = new App.MapModuleView({ id: "map_location" });
+		this.mapModuleView = new App.MapModuleView({el: this.$(".map#location")});
 
-		if(typeof this.model == "undefined" || this.model.get("reference") == null)
-		{
-			this.model = new App.Location();
-			this.mapModuleView.setCenter(App.FACEBOOK['user_location']['latitude'], App.FACEBOOK['user_location']['longitude']);
-		}
-		else
-		{
-			this.setLocation({
-				reference 	: this.model.get("reference"),
-				description : this.model.get("description")
-			});
-			this.model.getDetails();
-		}
-
+		this.model = new App.Location();
 		this.model.bind("change:reference", this.model.getDetails);
 
+		// Triggers when pin location is set
 		App.Events.on("setLocation", this.setLocation);
 		App.Events.on("delLocation", this.setLocation);
 		App.Events.on("LocationDetailsLoaded", this.renderMapModule);
+
+		// Set model coordinates to Facebook user's current city
+		var self = this;
+		App.Events.on('FacebookCredentialsSet', function(){
+			self.mapModuleView.model.set({ latitude: App.FACEBOOK['user_location']['latitude'], longitude: App.FACEBOOK['user_location']['longitude'] });
+		});
 	},
 
 	setLocation: function(model)
 	{
-		if(model != null) 	// setLocation
+		if(model != null)
 		{
-			this.model.set
-			({
-				"description"	: model.description,
-				"reference"		: model.reference,
-				"map" 			: this.mapModuleView
-			});
+			this.model.set({ map: this.mapModuleView, reference: model.reference, description: model.description });
 		}
-		else 				// delLocation
+		else
 		{
 			this.model.unset("description", { silent: true });
 			this.model.unset("reference", { silent: true });
 		}
 	},
 
-	renderSearchModule: function()
-	{
-		$(this.el).append((this.searchLocationModuleView.render()).el);
-	},
-
 	renderMapModule: function(model)
 	{
 		if(model != undefined)
-		{
 			this.mapModuleView.addConfirmationMarker(model);
-		}
-		$(this.el).prepend((this.mapModuleView.render()).el);
+		
+		this.mapModuleView.render();
 	},
 
 	render: function()
 	{
-		this.renderSearchModule();
+		this.$("#page-bottom").html((this.searchLocationModuleView.render()).el);
 		this.renderMapModule();
-		this.setElement($(this.el));
 		return this;
 	}
 

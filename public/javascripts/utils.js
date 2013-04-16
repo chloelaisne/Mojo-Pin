@@ -30,14 +30,18 @@ Utils.GetCoordinatesFromLocation = function(query, callback)
 			dataType: "json"
 		})
 		.done(function (data, textStatus, jqXHR){
-
-			if(data.results.length != 0)
+			if(data.status == "OVER_QUERY_LIMIT")
 			{
-				callback(data.results[0].reference, data.results[0].geometry.location.lat, data.results[0].geometry.location.lng);
+				console.log("OVER_QUERY_LIMIT");
 			}
 			else
 			{
-				callback(location.reference, location.latitude, location.longitude);
+				if(data.results.length != 0) {
+					callback(data.results[0].reference, data.results[0].geometry.location.lat, data.results[0].geometry.location.lng);
+				}
+				else {
+					callback(location.reference, location.latitude, location.longitude);
+				}
 			}
 		});
 	}
@@ -46,4 +50,11 @@ Utils.GetCoordinatesFromLocation = function(query, callback)
 	{
 		callback(location.reference, location.latitude, location.longitude);
 	}
+}
+
+Utils.DesignTextField = function(element)
+{
+	var defaultValue = $(element).text()
+	//element.onfocus
+	console.log(defaultValue);
 }

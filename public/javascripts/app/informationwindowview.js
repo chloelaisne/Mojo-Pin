@@ -1,6 +1,10 @@
-App.InformationWindowView = Backbone.View.extend();
+App.InformationWindowView = Backbone.View.extend({
 
-App.InformationWindowView.prototype = _.extend(Backbone.View.prototype, google.maps.OverlayView.prototype, {
+	initialize: function(){}
+	
+});
+
+_.extend(App.InformationWindowView.prototype, Backbone.View.prototype, google.maps.OverlayView.prototype,{
 
 	initialize: function(model)
 	{

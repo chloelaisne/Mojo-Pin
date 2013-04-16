@@ -1,21 +1,16 @@
 // Declare namespace
 window.App = {
 
-	// Facebook credentials
-	FACEBOOK: new Array(),
-
-	// Google Maps credentials
-	GOOGLE_MAPS: new Array(),
-
 	initialize: function()
 	{
-
 		// Set Facebook Credentials
+		this.FACEBOOK = new Array();
 		this.FACEBOOK["app_identifier"]	= "476683619043995";
 		this.FACEBOOK["app_permissions"]	= ['user_location','friends_location', 'publish_actions'];
 
 		// Set Google Maps Credentials
-		// this.GOOGLE_MAPS["key"] = "AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ";
+		this.GOOGLE_MAPS = new Array();
+		//this.GOOGLE_MAPS["key"] = "AIzaSyD9YAvbWKUsUhJfMZeZqKjROLrcM9kgCcQ";
 		this.GOOGLE_MAPS["key"] = "AIzaSyCSTzcjJfXnNFlnhe6x9hBzxCo5AxTOk88";
 		this.GOOGLE_MAPS["sensor"] = false;
 
@@ -36,6 +31,19 @@ window.App = {
 				App.Events.trigger("FacebookCredentialsGet", data);
 			}
 		});
+
+		$(window).bind("resize", this.resizeGlobal);
+
+		// Center friends list
+		var i = 0;
+		while(i + 170 <= $("body").width()) { i += 170; }
+		$("#friendslist ul").css({"width": i + "px"});
+		
+	},
+
+	resizeGlobal: function()
+	{
+		$("#global").css({"height": + $("body").height() - 52 + "px"});
 	},
 
 	resizeSidebar: function(){

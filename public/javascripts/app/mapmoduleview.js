@@ -1,15 +1,15 @@
 App.MapModuleView = Backbone.View.extend({
 
-	className: "map",
+	//className: "map",
 
 	// Array of all markers on the map
 	markers: [],
 
 	initialize: function()
 	{
-		_.bindAll(this, 'addMarker', 'onActivitySelected', 'addWindow', 'removeWindow', 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
+		_.bindAll(this, 'unsetLocation', 'setCenter', 'addMarker', 'onActivitySelected', 'addWindow', 'removeWindow', 'addNewMarker', 'addNoticeMarker', 'addConfirmationMarker', 'removeMarker', 'render');
 
-		App.Events.on("RemoveMarker", this.removeMarker);
+		App.Events.on("RemoveMarker", this.unsetLocation);
 		App.Events.on("ActivitySelected", this.onActivitySelected);
 
 		this.options =
@@ -18,20 +18,30 @@ App.MapModuleView = Backbone.View.extend({
 			panControl			: false,
 			mapTypeControl		: false,
 			streetViewControl	: false,
-			zoom				: 7
+			zoom				: 11
 		},
 
-		this.latlng = new google.maps.LatLng(-34.397, 150.644);
-		this.map = new google.maps.Map(this.el, this.options);
-		this.map.setCenter(this.latlng);
+		this.model = new Backbone.Model();
+		this.model.bind("change:latitude", this.setCenter);
 
-		$(window).bind("resize", this.render);
+		this.map = new google.maps.Map(this.el, this.options);
+		
+		//$(window).bind("resize", this.render);
 	},
 
-	setCenter: function(latitude, longitude)
+	setCenter: function()
 	{
-		this.latlng = new google.maps.LatLng(latitude, longitude);
-		this.map.setCenter(this.latlng);
+		var latlng = new google.maps.LatLng(this.model.get("latitude"), this.model.get("longitude"));
+		this.map.setCenter(latlng);
+	},
+
+	unsetLocation: function()
+	{
+		if(typeof this.confirmationMarker != 'undefined' && this.confirmationMarker.getMap() != null)
+		{
+			this.confirmationMarker.setMap(null);
+			this.confirmationWindowView.remove();
+		}
 	},
 
 	removeMarker: function(marker)
@@ -135,6 +145,19 @@ App.MapModuleView = Backbone.View.extend({
 		}
 	},
 
+	addNewMarker: function(model)
+	{
+		this.removeMarker(this.noticeMarker);
+		this.position = new google.maps.LatLng(model.location_latitude, model.location_longitude);
+		this.noticeMarkerOptions = {
+			position: this.position,
+			map: this.map
+		};
+		this.noticeMarker = new google.maps.Marker(this.noticeMarkerOptions);
+		this.map.setCenter(this.position);
+		this.noticeWindowView = new App.NoticeWindowView({ map: this.map, latlng: this.position, description: model.location_description });
+	},
+
 	addNoticeMarker: function(model)
 	{
 		this.removeMarker(this.noticeMarker);
@@ -151,24 +174,23 @@ App.MapModuleView = Backbone.View.extend({
 	addConfirmationMarker: function(model)
 	{
 		this.removeMarker(this.confirmationMarker);
-		this.position = new google.maps.LatLng(model.latitude, model.longitude);
+
+		this.model.set({ latitude: model.latitude, longitude: model.longitude});
+		var position = new google.maps.LatLng(this.model.get("latitude"), this.model.get("longitude"));
 		this.confirmationMarkerOptions = {
-			position: this.position,
+			position: position,
 			map: model.map.map
 		};
 		this.confirmationMarker = new google.maps.Marker(this.confirmationMarkerOptions);
-		this.map.setCenter(this.position);
-		this.confirmationWindowView = new App.ConfirmationWindowView({ map: model.map, latlng: this.position });
+		this.confirmationWindowView = new App.ConfirmationWindowView({ map: model.map, latlng: position });
 	},
 
 	render: function()
 	{
-		
 		$(this.el).css({
 			width: $("body").width() - $("#sidebar").outerWidth(),
 			height: $("body").height() - ($("#global").offset()).top - $("#page-bottom").outerHeight()
 		});
-
 		return this;
 	}
 

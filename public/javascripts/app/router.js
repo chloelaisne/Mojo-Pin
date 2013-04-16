@@ -4,6 +4,7 @@ App.Router = Backbone.Router.extend({
 
 	routes:
 	{
+		""					: "showFriends",
 		"login"				: "showLogin",
 		"offline"			: "showOffline",
 		"edit"				: "showEdit",
@@ -14,7 +15,7 @@ App.Router = Backbone.Router.extend({
 
 	initialize: function()
 	{
-		_.bindAll(this, 'loadViews', 'showLogin', 'showOffline', 'showApplication', 'showEdit', 'showUser', 'showFriends');
+		_.bindAll(this, 'showLogin', 'showOffline', 'showApplication', 'showEdit', 'showUser', 'showFriends');
 
 		this.views.master 		= new App.MasterView({ el: $("body") });
 		this.view = this.views.master;
@@ -27,19 +28,6 @@ App.Router = Backbone.Router.extend({
 		// Create all views related to the application
 		this.views.edit			= new App.EditView();
 		this.views.friends 		= new App.FriendsView();
-
-		App.Events.on("FacebookCredentialsSet", this.loadViews);
-	},
-
-	loadViews: function()
-	{
-		//this.views.login 		= new App.LoginView({ el: $("body") });
-		//this.views.application 	= new App.ApplicationView({ el: $("body") });
-		//this.views.offline 		= new App.OfflineView({ el: $("body") });
-
-		// Create all views related to the application
-		//this.views.edit			= new App.EditView();
-		//this.views.friends 		= new App.FriendsView();
 	},
 
 	showLogin: function()
@@ -66,9 +54,6 @@ App.Router = Backbone.Router.extend({
 			this.view = this.views.application;
     		this.view.render();
 		}
-		else {
-
-		}
 		
 	},
 
@@ -81,7 +66,9 @@ App.Router = Backbone.Router.extend({
 		// Set the body CSS class
 		this.views.master.model.set({ classname: 'edit' });
 
-		$('#global').html((this.views.edit.render()).el);
+		this.views.application.$('#global').html((this.views.edit.render()).el);
+
+		console.log('----------------------------');
 	},
 
 	showUser: function(id)
@@ -96,7 +83,9 @@ App.Router = Backbone.Router.extend({
 		// Create instance of user view and set user model
 		this.views.user = new App.UserView({ model: new App.User({ "facebook_id": id }) });
 		// Attach view to the DOM
-		$('#global').html((this.views.user.render()).el);
+		this.views.application.$('#global').html((this.views.user.render()).el);
+		// Resize maps to DOM element's size
+		google.maps.event.trigger(this.views.user.mapModuleView.map, 'resize')
 	},
 
 	showFriends: function()
@@ -108,7 +97,7 @@ App.Router = Backbone.Router.extend({
 		// Set the body CSS class
 		this.views.master.model.set({ classname: 'friends' });
 
-		$('#global').html((this.views.friends.render()).el);
+		this.views.application.$('#global').html((this.views.friends.render()).el);
 	}
 
 });
